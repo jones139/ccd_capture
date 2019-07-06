@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="static/css/bootstrap.css">
+
+    <title>Ccd_Capture</title>
+  </head>
+  <body>
+<!--      
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+	<a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">CfAI Durham</a>
+	<ul class="navbar-nav px-3">
+	  <li class="nav-item text-nowrap">
+	    <a class="nav-btn" href="#">Capture Image</a>
+	  </li>
+	</ul>
+      </nav>
+-->
+
+    <div class="container">
+
+
+
+      <ul class="nav nav-tabs" id="mainAppTabs" role="tablist">
+	<li class="nav-item">
+	  <a class="nav-link active" id="cameraControlTab"
+	     data-toggle="tab" role="tab"
+	     href="#cameraControlTabContent"
+	     aria-controls="cameraControlTab" aria-selected="true">
+	    Camera Control</a></li>
+	<li class="nav-item">
+	  <a class="nav-link active" id="analysisTab"
+	     data-toggle="tab" role="tab"
+	     href="#analysisTabContent"
+	     aria-controls="analysisTab" aria-selected="false">
+	    Analysis</a></li>
+      </ul>
+
+
+      <div class="tab-content" id="mainAppTabsContent">
+	<div class="tab-pane fade show active"
+	     id="cameraControlsTabContent" role="tabpanel"
+	     aria-labelledby="cameraControlTab-tab">
+	  <h1>Camera Controls Tab Content</h1>
+	  <ul>
+	    <li>Exposure (sec): <input id="exposure-input" value=0.1 /> <button id=set-exposure-button>Set Exposure</button></li>
+	    <li>SubFrame Origin (x,y): <input id="subframe-origin-x" value=0 />,
+	      <input id="subframe-origin-y" value=0 /> 
+	      <br/>
+	      SubFrame Size (x,y): <input id="subframe-size-x" value=1000 />,
+	      <input id="subframe-size-y" value=1000 />
+	      <button id="set-subframe-button">Set SubFrame</button>
+	    </li>
+	    <li>
+	      Cooler SetPoint: <input id="cooler-setpoint" value=15 />
+	      <button id="set-cooler-setpoint">Set</button>
+	    </li>
+	    <li>
+	      <button id="capture-single-image-button">Capture Single Image</button>
+	    </li>
+	    <li>
+	      <button id="capture-multiple-images-button">Capture Multiple Images</button>
+	    </li>
+	  </ul>
+	  <img id="histogram-image" alt="Histogram Image"/>
+	  <img id="camera-preview-image" alt="Camera Preview Image"/>
+	</div>
+	<div class="tab-pane fade"
+	     id="analysisTabContent" role="tabpanel"
+	     aria-labelledby="analysisTab-tab">
+	  Analysis Tab Content
+	  <ul>
+	    <li>
+	      X Profile Position:
+	      <input id="x-profile-input" value=500 />
+	      <button id="set-x-profile-button">Set X Profile Position</button>
+	    </li>
+	    <li>
+	      Y Profile Position:
+	      <input id="y-profile-input" value=500 />
+	      <button id="set-y-profile-button">Set Y Profile Position</button>
+	    </li>
+	  </ul>
+	  <img id="camera-preview-image" alt="Camera Preview Image"/>
+	  <img id="histogram-image" alt="Histogram Image"/>
+	  <img id="x-profile-image" alt="X Profile Image"/>
+	  <img id="y-profile-image" alt="Y Profile Image"/>
+	</div>
+      </div>
+
+      
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="static/js/jquery-3.3.1.min.js"></script>
+    <script src="static/js/popper.min.js"></script>
+    <script src="static/js/bootstrap.js"></script>
+  </body>
+</html>

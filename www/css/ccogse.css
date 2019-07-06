@@ -1,0 +1,27 @@
+html {
+    font-size: 12px;
+}
+
+.ccogse-section {
+    min-height: 500px;
+}
+
+.bg-ccogse-dark {
+    background-color: #504747;
+    color: white;
+}
+
+.bg-ccogse-dark .nav-tabs a .active {
+    background-color: white;
+}
+
+.bg-ccogse-light {
+    background-color: white;
+    color: #504747;
+}
+
+#loading-indicator {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+  }
