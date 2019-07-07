@@ -13,6 +13,8 @@ import numpy as np
 import io
 import astropy.io.fits
 import PyIndi
+import cv2
+import matplotlib.pyplot as plt
 from WebControlClass import WebControlClass
 
 
@@ -27,7 +29,11 @@ class IndiClient(PyIndi.BaseClient):
         print("newDevice:",d.getDeviceName())
 
     def newProperty(self, p):
-        pass
+        print("New property ", p.getName(), " for device ",
+              p.getDeviceName())
+        if (p.getName() == "CCD_FRAME"):
+            for n in p.getNumber():
+                print(n.name, " = ", n.value)
     def removeProperty(self, p):
         pass
     def newBLOB(self, bp):
@@ -64,6 +70,9 @@ class Ccd_capture(WebControlClass):
     STATUS_IDLE = 1
     STATUS_EXPOSING = 2
     STATUS_DOWNLOADING = 3
+
+    WEB_X_MAX = 600
+    WEB_Y_MAX = 400
     
     indiConnected = False
     cameraInitialised = False
@@ -235,7 +244,9 @@ class Ccd_capture(WebControlClass):
             sys.stderr.write(".")
         print("got exposure object ", self.ccd_exposure)
 
-
+        self.getFrame()
+        self.getSubFrame()
+        
         # we should inform the indi server that we want to receive the
         # "CCD1" blob from this device
         print("Setting BLOB Mode")
@@ -248,6 +259,63 @@ class Ccd_capture(WebControlClass):
         print(self.msg)
 
 
+    def getFrame(self):
+        """ Populates this object with the current frame dimensions
+        in the camera.
+        """
+        print("Getting CCD_INFO Object..")
+        ccd_info=self.device_ccd.getNumber("CCD_INFO")
+        while not(ccd_info):
+            time.sleep(0.5)
+            ccd_info=self.device_ccd.getNumber("CCD_INFO")
+            sys.stderr.write(".")
+        print("got ccd_info object ", ccd_info)
+        for n in ccd_info:
+            print(n.name," = ",n.value)
+        self.frameSizeX = ccd_info[0].value
+        self.frameSizeY = ccd_info[1].value
+        print("getFrame Complete")
+
+    def getSubFrame(self):
+        """ Populates this object with the current subframe dimensions
+        in the camera.
+        """
+        print("Getting Frame Object..")
+        ccd_frame=self.device_ccd.getNumber("CCD_FRAME")
+        while not(ccd_frame):
+            time.sleep(0.5)
+            ccd_frame=self.device_ccd.getNumber("CCD_FRAME")
+            sys.stderr.write(".")
+        print("got frame object ", ccd_frame)
+        for n in ccd_frame:
+            print(n.name," = ",n.value)
+        self.subFrameOriginX = ccd_frame[0].value
+        self.subFrameOriginY = ccd_frame[1].value
+        self.subFrameSizeX = ccd_frame[2].value
+        self.subFrameSizeY = ccd_frame[3].value
+        print("getSubFrame complete")
+
+    def setSubFrame(self):
+        """ sets the camera frame dimensions based on the properties
+        of this object.
+        """
+        print("Getting Frame Object..")
+        ccd_frame=self.device_ccd.getNumber("CCD_FRAME")
+        while not(ccd_frame):
+            time.sleep(0.5)
+            ccd_frame=self.device_ccd.getNumber("CCD_FRAME")
+            sys.stderr.write(".")
+        print("got frame object ", ccd_frame)
+        for n in ccd_frame:
+            print(n.name," = ",n.value)
+        ccd_frame[0].value = self.subFrameOriginX
+        ccd_frame[1].value = self.subFrameOriginY
+        ccd_frame[2].value = self.subFrameSizeX
+        ccd_frame[3].value = self.subFrameSizeY
+        self.indiclient.sendNewNumber(ccd_frame)
+        print("setFrame complete")
+
+        
     def startExposure(self):
         """ Request the camera to start an exposure """
         print("startExposure()")
@@ -344,8 +412,36 @@ class Ccd_capture(WebControlClass):
     def getWebImage(self):
         """ return a copy of the current image, scaled to 800 px width
         """
-        return self.curImg
+        xMax = int(self.WEB_X_MAX)
+        yMax = int(self.subFrameSizeY * xMax / self.subFrameSizeX)
 
+        if (yMax > self.WEB_Y_MAX):
+            yMax = int(self.WEB_Y_MAX)
+            xMax = int(self.subFrameSizeX * yMax / self.subFrameSizeY)
+        res = cv2.resize(self.curImg, dsize=(xMax,yMax),
+                         interpolation=cv2.INTER_CUBIC)
+        success, encImg = cv2.imencode('.png',res)
+        imgBytes = encImg.tobytes()
+        return(imgBytes)
+
+    def getFrameHistogram(self):
+        """ get an image of the histogram of the current image.
+        """
+        histData, bins = np.histogram(self.curImg,256)
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure & 1 axis
+        print(histData)
+        ax.plot(histData)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format='png')
+        histImg.seek(0)
+        fig.savefig('hist.png')   # save the figure to file
+        plt.close(fig)    # close the figure
+
+        return(histImg)
+        #success, encImg = cv2.imencode('.png',self.curImg)
+        #imgBytes = encImg.tobytes()
+        #return(imgBytes)
+    
     def onWwwCmd(self,cmdStr,valStr, methodStr,request):
         ''' Process the command, with parameter 'valStr' using request
         method methodStr, and return the appropriate response.
@@ -356,15 +452,24 @@ class Ccd_capture(WebControlClass):
         if (methodStr=="GET"):
             if (cmdStr.lower()=="getData".lower()):
                 return self.toJson()
-            if (cmdStr.lower()=="getImage".lower()):
+            elif (cmdStr.lower()=="getImage".lower()):
                 if (self.status == self.STATUS_NO_IMAGE):
                     print("getImage(): no image yet!")
                     return("<p>No Image</p>")
                 else:
-                    response.set_header('Content-type', 'image/png')
-                    return(self.getWebImage)
-            if (cmdStr.lower()=="getFullImage".lower()):
+                    # response.set_header('Content-type', 'image/png')
+                    img = self.getWebImage()
+                    print("getImage: img=",img)
+                    return(img)
+            elif (cmdStr.lower()=="getFullImage".lower()):
                 print("FIXME - Implement getFullImage")
+            elif (cmdStr.lower()=="getFrameHistogram".lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print("getFrameHistogram(): no image yet!")
+                    return("<p>No Image</p>")
+                else:
+                    img = self.getFrameHistogram()
+                    return(img)
             else:
                 print("ERROR - Unreconised Command %s" % cmdStr)
                 return("<h1>ERROR - Unreconised Command %s</h1>" % cmdStr)
@@ -389,8 +494,11 @@ class Ccd_capture(WebControlClass):
             elif (cmdStr.lower()=="setSubFrame".lower()):
                 origin, size =  valStr.split(":")
                 print(origin,size)
-                self.subFrameOriginX, self.subFrameOriginY = origin.split(",")
-                self.subFrameSizeX, self.subFrameSizeY = size.split(",")
+                self.subFrameOriginX = int(origin.split(",")[0])
+                self.subFrameOriginY = int(origin.split(",")[1])
+                self.subFrameSizeX   = int(size.split(",")[0])
+                self.subFrameSizeY   = int(size.split(",")[1])
+                self.setSubFrame()
                 return("ok")
             else:                
                 print("ERROR - Unreconised Command %s" % cmdStr)
@@ -409,6 +517,7 @@ if __name__ == "__main__":
     print("ccd_capture.__main__()")
 
     dataDir = "./data"
-    cameraId = "CCD Simulator"
+    #cameraId = "CCD Simulator"
+    cameraId = "Atik 383L"
     ccdCapture = Ccd_capture(cameraId, dataDir)
     print("Ccd_capture complete")

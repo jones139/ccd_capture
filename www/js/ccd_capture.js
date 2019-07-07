@@ -1,4 +1,6 @@
 
+var lastImageDate = new Date().getTime()/1000;
+
 function getData() {
     $.ajax({url:"/getData",success:updateDashboard});
 };
@@ -19,10 +21,15 @@ function updateDashboard(dataStr) {
 	    var seconds = "0" + date.getSeconds();
 	    var timeStr = hours.substr(-2) + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 	    var imageAge = Math.floor(new Date().getTime()/1000 - val)
-	    $("#"+key).html(timeStr + " (" + imageAge + " s old)");
-
-// Will display time in 10:30:23 format
-var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+	    var imgSrc = "/getImage?"+ new Date().getTime();
+	    $("#"+key).html(timeStr + " (" + imageAge + " s old) - imgSrc="+ imgSrc);
+	    // If we have a new image available, display it, otherwise do not
+	    // refresh preview image to save bandwidth.
+	    if ((val - lastImageDate) > 1) {
+		$("#camera-preview-image").attr("src",imgSrc);
+		$("#histogram-image").attr("src","/getFrameHistogram?"+ new Date().getTime());
+		lastImageDate = val;
+	    }
 	} else {
             $("#"+key).html(val);
         }
