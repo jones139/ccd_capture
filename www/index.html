@@ -10,107 +10,154 @@
 
     <title>Ccd_Capture</title>
   </head>
-  <body>
-<!--      
-    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-	<a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">CfAI Durham</a>
-	<ul class="navbar-nav px-3">
-	  <li class="nav-item text-nowrap">
-	    <a class="nav-btn" href="#">Capture Image</a>
-	  </li>
-	</ul>
-      </nav>
--->
+  <body style="padding-top: 70px; ">
 
     <div class="container">
 
-          <img src="static/images/ajax-loader.gif" 
-            id="loading-indicator" 
-            style="display:none" />
-
-
-      <ul class="nav nav-tabs" id="mainAppTabs" role="tablist">
-	<li class="nav-item">
-	  <a class="nav-link active" id="cameraControlTab"
-	     data-toggle="tab" role="tab"
-	     href="#cameraControlTabContent"
-	     aria-controls="cameraControlTab" aria-selected="true">
-	    Camera Control</a></li>
-	<li class="nav-item">
-	  <a class="nav-link active" id="analysisTab"
-	     data-toggle="tab" role="tab"
-	     href="#analysisTabContent"
-	     aria-controls="analysisTab" aria-selected="false">
-	    Analysis</a></li>
-      </ul>
-
-
-      <div class="tab-content" id="mainAppTabsContent">
-	<div class="tab-pane fade show active"
-	     id="cameraControlsTabContent" role="tabpanel"
-	     aria-labelledby="cameraControlTab-tab">
-	  <h1>Camera Controls Tab Content</h1>
-	  <ul>
-	    <li><span id="cameraId">cameraId</span> Frame=(<span id="frameSizeX">-</span>,<span id="frameSizeY">-</span>) px</li>
-	    <li>Exposure <span id="exposureTime">-</span> (sec): <input id="exposure-input" value=0.1 /> <button id=set-exposure-btn>Set Exposure</button></li>
-	    <li>SubFrame Origin (x,y) (<span id="subFrameOriginX">-</span>,<span id="subFrameOriginY">-</span>): <input id="subframe-origin-x" value=0 />,
-	      <input id="subframe-origin-y" value=0 /> 
-	      <br/>
-	      SubFrame Size (x,y) (<span id="subFrameSizeX">-</span>,<span id="subFrameSizeY">-</span>): <input id="subframe-size-x" value=1000 />,
-	      <input id="subframe-size-y" value=1000 />
-	      <button id="set-subframe-btn">Set SubFrame</button>
+      <nav class="navbar navbar-dark fixed-top bg-dark navbar-expand-lg">
+	<div class="container-fluid">
+	  <div class="navbar-header">
+	    <a class="navbar-brand" href="#">CfAI Durham</a>
+	  </div>
+	  <ul class="nav navbar-nav">
+	    <li>
+	      Status=
+	      <span class="bg-danger" id="status-str">
+		-
+	      </span>
 	    </li>
 	    <li>
-	      Cooler SetPoint <span id="coolerSetpoint">-</span> deg: <input id="cooler-setpoint" value=15 />
-	      <button id="set-cooler-setpoint-btn">Set</button>
-		  <input type="checkbox" id=cooler-on-checkbox> Cooler On
+	      <button id="capture-single-image-btn" class="btn btn-primary" >
+		Capture Single Image
+	      </button>
 	    </li>
 	    <li>
-	      <button id="capture-single-image-btn">Capture Single Image</button>
+	      <input id="fname-input" class="form-control" value=fname />
 	    </li>
 	    <li>
-	      <button id="capture-multiple-images-btn">Capture Multiple Images</button>
+	      <button id="save-image-btn" class="btn btn-primary" >
+		Save Image
+	      </button>
 	    </li>
 	  </ul>
-	  <p>Current Image Time: <span id="curImageTime">---</span>.</p>
-	  <img id="histogram-image" alt="Histogram Image"/>
-	  <img id="camera-preview-image" alt="Camera Preview Image"/>
 	</div>
-	<div class="tab-pane fade"
-	     id="analysisTabContent" role="tabpanel"
-	     aria-labelledby="analysisTab-tab">
-	  Analysis Tab Content
-	  <ul>
-	    <li>
-	      X Profile Position:
-	      <input id="x-profile-input" value=500 />
-	      <button id="set-x-profile-button">Set X Profile Position</button>
-	    </li>
-	    <li>
-	      Y Profile Position:
-	      <input id="y-profile-input" value=500 />
-	      <button id="set-y-profile-button">Set Y Profile Position</button>
-	    </li>
-	  </ul>
-	  <img id="camera-preview-image" alt="Camera Preview Image"/>
-	  <img id="histogram-image" alt="Histogram Image"/>
-	  <img id="x-profile-image" alt="X Profile Image"/>
-	  <img id="y-profile-image" alt="Y Profile Image"/>
-	</div>
-      </div>
+      </nav>
 
+
+      <img src="static/images/ajax-loader.gif" 
+           id="loading-indicator" 
+           style="display:none" />
       
+      
+      <h2>
+	<span id="cameraId">cameraId</span>
+	, Frame=(
+	<span id="frameSizeX">-</span>,
+	<span id="frameSizeY">-</span>) px.
+      </h2>
+      
+      <div class="input-group">
+	<div class="input-group-prepend input-group-text">
+	  Exposure &nbsp;
+	  <span id="exposureTime">-</span> (sec):
+	</div>
+	<input id="exposure-input" class="form-control" value=0.1 />
+	<button id="set-exposure-btn" class="btn btn-primary" >
+	  Set Exposure
+	</button>
+      </div>
+      
+      <div class="input-group">
+	<div class="input-group-prepend input-group-text">
+	  Cooler &nbsp;
+	  <span id="currentTemp">-</span>
+	  , SetPoint &nbsp;
+	  <span id="coolerSetpoint">-</span> deg:
+	</div>
+	<input id="cooler-setpoint" class="form-control" value=15 />
+	<button id="set-cooler-setpoint-btn" class="btn btn-primary" >
+	  Set Setpoint
+	</button>
+	<button id="cooler-on-btn"  class="btn btn-primary">
+	  Cooler On
+	</button>
+      </div>
+      
+      <div class="input-group">
+	<div class="input-group-prepend input-group-text">
+	  SubFrame Origin (x,y) (
+	  <span id="subFrameOriginX">-</span>
+	  ,
+	  <span id="subFrameOriginY">-</span>
+	  ):
+	</div>
+	<input id="subframe-origin-x" class="form-control" value=0 />,
+	<input id="subframe-origin-y" class="form-control" value=0 /> 
+      </div>
+      <div class="input-group">
+	<div class="input-group-prepend input-group-text">
+	  SubFrame Size (x,y) (
+	  <span id="subFrameSizeX">-</span>,
+	  <span id="subFrameSizeY">-</span>):
+	</div>
+	<input id="subframe-size-x" class="form-control" value=1000 />,
+	<input id="subframe-size-y" class="form-control" value=1000 />
+	<button id="set-subframe-btn" class="btn btn-primary" >Set SubFrame</button>
+      </div>
+      
+      <div class="input-group">
+	<div class="input-group-prepend input-group-text">
+	  ROI Origin (x,y) (
+	  <span id="roiOriginX">-</span>,
+	  <span id="roiOriginY">-</span>):
+	</div>
+	<input id="roi-origin-x" class="form-control" value=0 />,
+	<input id="roi-origin-y" class="form-control" value=0 /> 
+      </div>
+      <div class="input-group">
+	<div class="input-group-prepend input-group-text">
+	  ROI Size (x,y) (
+	  <span id="roiSizeX">-</span>,
+	  <span id="roiSizeY">-</span>):
+	</div>
+	<input id="roi-size-x" class="form-control" value=1000 />,
+	<input id="roi-size-y" class="form-control" value=1000 />
+	<button id="set-roi-btn" class="btn btn-primary" >Set ROI</button>
+	<button id="clear-roi-btn" class="btn btn-primary" >Clear ROI</button>
+      </div>
+      
+      
+      <p>Current Image Time: <span id="curImageTime">---</span>.</p>
+      <p>Image Mean Intensity: <span id="curImageMean">--</span>,
+	SD: <span id="curImageSd">--</span>&percnt;</p>
+      <p>ROI Mean Intensity: <span id="curRoiMean">--</span>,
+	SD: <span id="curRoiSd">--</span>&percnt;</p>
+      <img id="histogram-image" alt="Histogram Image"
+	   class="img-fluid" style="width:30%"/>
+      <img id="x-profile-image" alt="X Profile Image"
+	   style="width:30%"/>
+      <img id="y-profile-image" alt="Y Profile Image"
+	   style="width:30%"/>
+      <img id="roi-histogram-image" alt="ROI Histogram Image"
+	   class="img-fluid" style="width:30%"/>
+      <img id="roi-x-profile-image" alt="ROI X Profile Image"
+	   style="width:30%"/>
+      <img id="roi-y-profile-image" alt="ROI Y Profile Image"
+	   style="width:30%"/>
+      <img id="camera-preview-image" alt="Camera Preview Image"/>
+      <img id="roi-preview-image" alt="ROI Preview Image"/>
     </div>
-
+    
+    
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="static/js/jquery-3.3.1.min.js"></script>
     <script src="static/js/popper.min.js"></script>
     <script src="static/js/bootstrap.js"></script>
-
+    
     <script src="static/js/ccd_capture.js"></script>
 
-
+    
     
   </body>
 </html>

@@ -1,5 +1,5 @@
 
-var lastImageDate = new Date().getTime()/1000;
+var lastImageDate = -1;
 
 function getData() {
     $.ajax({url:"/getData",success:updateDashboard});
@@ -25,11 +25,43 @@ function updateDashboard(dataStr) {
 	    $("#"+key).html(timeStr + " (" + imageAge + " s old) - imgSrc="+ imgSrc);
 	    // If we have a new image available, display it, otherwise do not
 	    // refresh preview image to save bandwidth.
-	    if ((val - lastImageDate) > 1) {
+	    if (((val - lastImageDate) > 1) || (lastImageDate==-1)) {
 		$("#camera-preview-image").attr("src",imgSrc);
+		$("#roi-preview-image").attr("src","/getRoiImage?" + new Date().getTime());
 		$("#histogram-image").attr("src","/getFrameHistogram?"+ new Date().getTime());
+		$("#x-profile-image").attr("src","/getXProfile?"+ new Date().getTime());
+		$("#y-profile-image").attr("src","/getYProfile?"+ new Date().getTime());
+		$("#roi-histogram-image").attr("src","/getRoiHistogram?"+ new Date().getTime());
+		$("#roi-x-profile-image").attr("src","/getRoiXProfile?"+ new Date().getTime());
+		$("#roi-y-profile-image").attr("src","/getRoiYProfile?"+ new Date().getTime());
 		lastImageDate = val;
 	    }
+	    ///////////////////////////////////////////////////
+	} else if (key == "statusVal") {
+	    var statusStr;
+	    switch(val) {
+	    case 0:
+		statusStr = "No Image";
+		break;
+	    case 1:
+		statusStr = "Ready / Idle";
+		break;
+	    case 2:
+		statusStr = "Exposure in Progress";
+		break;
+	    case 3:
+		statusStr = "Downloading";
+		break;
+	    default:
+		statusStr = "Error - "+val;
+	    }
+	    $("#status-str").html(statusStr);
+	    if ((val==2) || (val==3)) {
+		$("#capture-single-image-btn").prop('disabled', true);
+	    } else {
+		$("#capture-single-image-btn").prop('disabled', false);
+	    }		
+	    /////////////////////////////////////////////////
 	} else {
             $("#"+key).html(val);
         }
@@ -63,7 +95,25 @@ $(document).ready(function(){
             //alert("data: "+data);
         });
     });
+
+    $("#set-roi-btn").click(function(evt) {
+        $('#loading-indicator').show();
+	val = $("#roi-origin-x").val() + "," + $("#roi-origin-y").val()
+	    + ":" + $("#roi-size-x").val() + "," + $("#roi-size-y").val();
+        $.post("/setRoi/"+val, function(data,status) {
+            $('#loading-indicator').hide();
+            //alert("data: "+data);
+        });
+    });
     
+    $("#clear-roi-btn").click(function(evt) {
+        $('#loading-indicator').show();
+        $.post("/clearRoi/", function(data,status) {
+            $('#loading-indicator').hide();
+            //alert("data: "+data);
+        });
+    });
+
     $("#capture-single-image-btn").click(function(evt) {
         $('#loading-indicator').show();
         $.post("/startExposure/", function(data,status) {

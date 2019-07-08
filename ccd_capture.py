@@ -3,6 +3,7 @@
 # Provides a web based front end to a CCD camera, that is controlled
 # using the INDI protocol.
 
+import argparse
 from datetime import datetime
 import time
 import os
@@ -79,14 +80,23 @@ class Ccd_capture(WebControlClass):
     exposureTime = 0.5  # Exposure time in seconds
     subFrameOriginX = 0  # Pixels
     subFrameOriginY = 0  # Pixels
-    subFrameSizeX = 0  # Pixels
-    subFrameSizeY = 0  # Pixels
+    subFrameSizeX = 500  # Pixels
+    subFrameSizeY = 500  # Pixels
+    roiOriginX = 0  # Pixels
+    roiOriginY = 0  # Pixels
+    roiSizeX = 100  # Pixels
+    roiSizeY = 100  # Pixels
     frameSizeX = 0  # Pixels
     frameSizeY = 0  # Pixels
     coolerSetpoint = 0.0 # degC
     coolerOn = False
 
     curImageTime = 0  # Time current image was collected
+
+    curImageMean = -1
+    curImageSd = -1
+    curRoiMean = -1
+    curRoiSd = -1
 
     status = STATUS_NO_IMAGE
     errorState = 0  # 0=ok, -1=warning, -2=error
@@ -117,11 +127,19 @@ class Ccd_capture(WebControlClass):
         obj['subFrameOriginY']=self.subFrameOriginY
         obj['subFrameSizeX']=self.subFrameSizeX
         obj['subFrameSizeY']=self.subFrameSizeY
+        obj['roiOriginX']=self.roiOriginX
+        obj['roiOriginY']=self.roiOriginY
+        obj['roiSizeX']=self.roiSizeX
+        obj['roiSizeY']=self.roiSizeY
         obj['frameSizeX']=self.frameSizeX
         obj['frameSizeY']=self.frameSizeY
         obj['coolerSetpoint']=self.coolerSetpoint
         obj['coolerOn']=self.coolerOn
         obj['curImageTime']=self.curImageTime
+        obj['curImageMean']="%.1f" % self.curImageMean
+        obj['curImageSd']="%.1f" % self.curImageSd
+        obj['curRoiMean']="%.1f" % self.curRoiMean
+        obj['curRoiSd']="%.1f" % self.curRoiSd
 
 
         jsonStr = json.dumps(obj,indent=2,sort_keys=True)
@@ -405,43 +423,176 @@ class Ccd_capture(WebControlClass):
         #print(hdu.header)
         self.curImg = np.asarray(hdu.data,dtype=np.uint16)
         self.curImageTime = datetime.now().timestamp()
+        self.curImageMean = self.curImg.mean()
+        self.curImageSd = 100 * self.curImg.std() / self.curImageMean
+
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+
+        self.curRoiMean = roiImg.mean()
+        self.curRoiSd = 100 * roiImg.std() / self.curRoiMean
         self.status = self.STATUS_IDLE
         print("curImageTime=%s" % self.curImageTime)
         
 
-    def getWebImage(self):
-        """ return a copy of the current image, scaled to 800 px width
-        """
+    def resizeImgForWeb(self,img):
+        """ Returns a re-sized image for web viewing """
         xMax = int(self.WEB_X_MAX)
-        yMax = int(self.subFrameSizeY * xMax / self.subFrameSizeX)
+        yMax = int(img.shape[0] * xMax / img.shape[1])
 
         if (yMax > self.WEB_Y_MAX):
             yMax = int(self.WEB_Y_MAX)
-            xMax = int(self.subFrameSizeX * yMax / self.subFrameSizeY)
-        res = cv2.resize(self.curImg, dsize=(xMax,yMax),
+            xMax = int(img.shape[1] * yMax / img.shape[0])
+        res = cv2.resize(img, dsize=(xMax,yMax),
                          interpolation=cv2.INTER_CUBIC)
+        return(res)
+
+    def getWebImage(self):
+        """ return a copy of the current image, scaled to 800 px width
+        """
+        res = self.resizeImgForWeb(self.curImg)
         success, encImg = cv2.imencode('.png',res)
         imgBytes = encImg.tobytes()
         return(imgBytes)
 
+    def getRoiWebImage(self):
+        """ return a copy of the current image, scaled to 800 px width
+        """
+        roiImg = self.curImg.copy()
+        cv2.rectangle(roiImg,
+                      (self.roiOriginX, self.roiOriginY),
+                      (self.roiOriginX + self.roiSizeX,
+                       self.roiOriginY + self.roiSizeY),
+                      (0,0,0),
+                      3)
+        cv2.rectangle(roiImg,
+                      (self.roiOriginX, self.roiOriginY),
+                      (self.roiOriginX + self.roiSizeX+1,
+                       self.roiOriginY + self.roiSizeY+1),
+                      (255,255,255),
+                      3)
+        res = self.resizeImgForWeb(roiImg)
+        success, encImg = cv2.imencode('.png',res)
+        imgBytes = encImg.tobytes()
+        return(imgBytes)
+
+    
     def getFrameHistogram(self):
         """ get an image of the histogram of the current image.
         """
         histData, bins = np.histogram(self.curImg,256)
         fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure & 1 axis
-        print(histData)
+        #print(histData)
         ax.plot(histData)
+        ax.set_title("Intensity Histogram")
         histImg = io.BytesIO()
         fig.savefig(histImg, format='png')
         histImg.seek(0)
         fig.savefig('hist.png')   # save the figure to file
         plt.close(fig)    # close the figure
+        return(histImg)
+
+    def getRoiHistogram(self):
+        """ get an image of the histogram of the current image ROI.
+        """
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+        histData, bins = np.histogram(roiImg,256)
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure & 1 axis
+        #print(histData)
+        ax.plot(histData)
+        ax.set_title("ROI Intensity Histogram")
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format='png')
+        histImg.seek(0)
+        fig.savefig('hist.png')   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+    
+    def getXProfile(self):
+        """ get an image of the X profile chart
+        """
+        midY = int(self.curImg.shape[0]/2)
+        intProfile = self.curImg[midY,:]
+        xData = np.linspace(0,self.curImg.shape[1]-1,self.curImg.shape[1])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure & 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title("X Intensity Profile")
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format='png')
+        histImg.seek(0)
+        fig.savefig('xProfile.png')   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+    def getRoiXProfile(self):
+        """ get an image of the ROI X profile chart
+        """
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+        midY = int(roiImg.shape[0]/2)
+        intProfile = roiImg[midY,:]
+        xData = np.linspace(0,roiImg.shape[1]-1,roiImg.shape[1])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure & 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title("ROI X Intensity Profile")
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format='png')
+        histImg.seek(0)
+        fig.savefig('roiXProfile.png')   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+    
+    def getYProfile(self):
+        """ get an image of the Y profile chart
+        """
+        midX = int(self.curImg.shape[1]/2)
+        intProfile = self.curImg[:,midX]
+        xData = np.linspace(0,self.curImg.shape[0]-1,self.curImg.shape[0])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure & 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title("Y Intensity Profile")
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format='png')
+        histImg.seek(0)
+        fig.savefig('yProfile.png')   # save the figure to file
+        plt.close(fig)    # close the figure
 
         return(histImg)
-        #success, encImg = cv2.imencode('.png',self.curImg)
-        #imgBytes = encImg.tobytes()
-        #return(imgBytes)
     
+    def getRoiYProfile(self):
+        """ get an image of the Y profile chart
+        """
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+        midX = int(roiImg.shape[1]/2)
+        intProfile = roiImg[:,midX]
+        xData = np.linspace(0,roiImg.shape[0]-1,roiImg.shape[0])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure & 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title("ROI Y Intensity Profile")
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format='png')
+        histImg.seek(0)
+        fig.savefig('roiYProfile.png')   # save the figure to file
+        plt.close(fig)    # close the figure
+
+        return(histImg)
+    
+        
     def onWwwCmd(self,cmdStr,valStr, methodStr,request):
         ''' Process the command, with parameter 'valStr' using request
         method methodStr, and return the appropriate response.
@@ -459,7 +610,16 @@ class Ccd_capture(WebControlClass):
                 else:
                     # response.set_header('Content-type', 'image/png')
                     img = self.getWebImage()
-                    print("getImage: img=",img)
+                    #print("getImage: img=",img)
+                    return(img)
+            elif (cmdStr.lower()=="getRoiImage".lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print("getRoiImage(): no image yet!")
+                    return("<p>No Image</p>")
+                else:
+                    # response.set_header('Content-type', 'image/png')
+                    img = self.getRoiWebImage()
+                    #print("getRoi Image: img=",img)
                     return(img)
             elif (cmdStr.lower()=="getFullImage".lower()):
                 print("FIXME - Implement getFullImage")
@@ -470,6 +630,44 @@ class Ccd_capture(WebControlClass):
                 else:
                     img = self.getFrameHistogram()
                     return(img)
+            elif (cmdStr.lower()=="getXProfile".lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print("getXProfile(): no image yet!")
+                    return("<p>No Image</p>")
+                else:
+                    img = self.getXProfile()
+                    return(img)
+            elif (cmdStr.lower()=="getYProfile".lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print("getYProfile(): no image yet!")
+                    return("<p>No Image</p>")
+                else:
+                    img = self.getYProfile()
+                    return(img)
+
+            elif (cmdStr.lower()=="getRoiHistogram".lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print("getRoiHistogram(): no image yet!")
+                    return("<p>No Image</p>")
+                else:
+                    img = self.getRoiHistogram()
+                    return(img)
+            elif (cmdStr.lower()=="getRoiXProfile".lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print("getRoiXProfile(): no image yet!")
+                    return("<p>No Image</p>")
+                else:
+                    img = self.getRoiXProfile()
+                    return(img)
+            elif (cmdStr.lower()=="getRoiYProfile".lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print("getRoiYProfile(): no image yet!")
+                    return("<p>No Image</p>")
+                else:
+                    img = self.getRoiYProfile()
+                    return(img)
+
+
             else:
                 print("ERROR - Unreconised Command %s" % cmdStr)
                 return("<h1>ERROR - Unreconised Command %s</h1>" % cmdStr)
@@ -500,6 +698,26 @@ class Ccd_capture(WebControlClass):
                 self.subFrameSizeY   = int(size.split(",")[1])
                 self.setSubFrame()
                 return("ok")
+            elif (cmdStr.lower()=="setRoi".lower()):
+                origin, size =  valStr.split(":")
+                print(origin,size)
+                self.roiOriginX = int(origin.split(",")[0])
+                self.roiOriginY = int(origin.split(",")[1])
+                self.roiSizeX   = int(size.split(",")[0])
+                self.roiSizeY   = int(size.split(",")[1])
+
+                if (self.roiOriginX + self.roiSizeX > self.subFrameSizeX):
+                    self.roiSizeX = self.subFrameSizeX - self.roiOriginX
+                    print("Clipped ROI to fit in subFrame - X")
+                if (self.roiOriginY + self.roiSizeY > self.subFrameSizeY):
+                    self.roiSizeY = self.subFrameSizeY - self.roiOriginY
+                    print("Clipped ROI to fit in subFrame - Y")
+                return("ok")
+            elif (cmdStr.lower()=="clearRoi".lower()):
+                self.roiOriginX = self.subFrameOriginX
+                self.roiOriginY = self.subFrameOriginY
+                self.roiSizeX   = self.subFrameSizeX
+                self.roiSizeY   = self.subFrameSizeY
             else:                
                 print("ERROR - Unreconised Command %s" % cmdStr)
                 return("<h1>ERROR - Unreconised Command %s</h1>" % cmdStr)
@@ -516,8 +734,20 @@ class Ccd_capture(WebControlClass):
 if __name__ == "__main__":
     print("ccd_capture.__main__()")
 
+
+    parser = argparse.ArgumentParser(description='CCD Camera Server')
+    parser.add_argument('--sim', dest='simulator', action='store_true',
+                        help='Use the simulator rather than the real camera')
+
+    argsNamespace = parser.parse_args()
+    args = vars(argsNamespace)
+    print(args)
+
+    
     dataDir = "./data"
-    #cameraId = "CCD Simulator"
-    cameraId = "Atik 383L"
+    if (args['simulator']):
+        cameraId = "CCD Simulator"
+    else:
+        cameraId = "Atik 383L"
     ccdCapture = Ccd_capture(cameraId, dataDir)
     print("Ccd_capture complete")
