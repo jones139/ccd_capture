@@ -26,7 +26,11 @@ class WebControlClass:
         print("WebControlClass.__init__(portNo=%d)" % (int(portNo)))
         self.portNo = portNo
         self.scriptDir = os.path.dirname(os.path.realpath(__file__))
+        self.wwwPath = os.path.join(self.scriptDir,'www')
+        print("wwwPath=%s" % self.wwwPath)
 
+    def getWwwPath(self):
+        return(self.wwwPath)
 
     def startServer(self):
         wwwThread = threading.Thread(target=self._startServer)
@@ -40,9 +44,7 @@ class WebControlClass:
 
         @app.route('/static/<filepath:path>')
         def server_static(filepath):
-            wwwPath = os.path.join(self.scriptDir,'www')
-            print("wwwPath=%s" % wwwPath)
-            return bottle.static_file(filepath, root=wwwPath)
+            return bottle.static_file(filepath, root=self.wwwPath)
 
         @app.route('/')
         @app.route('/index.html')

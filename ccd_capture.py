@@ -90,6 +90,9 @@ class Ccd_capture(WebControlClass):
     frameSizeY = 0  # Pixels
     coolerSetpoint = 0.0 # degC
     coolerOn = False
+    continuousMode = False
+    saveFnameRoot = "fname"
+    autoSave = False
 
     curImageTime = 0  # Time current image was collected
 
@@ -107,7 +110,8 @@ class Ccd_capture(WebControlClass):
         WebControlClass.__init__(self,portNo=8081)
 
         self.cameraId = cameraId
-        self.dataDir = dataDir
+        self.dataDir = os.path.join(self.wwwPath,dataDir)
+        print("dataDir=%s" % self.dataDir)
         self.status = self.STATUS_NO_IMAGE
 
         if (not os.path.exists(self.dataDir)):
@@ -365,33 +369,6 @@ class Ccd_capture(WebControlClass):
         print("startExposure Complete")
 
 
-    def receiveImage_file(self):
-        """ called by indiClient when Blob received
-        """
-        print("receiveImage()")
-        for blob in self.ccd_ccd1:
-            #print("name: ", blob.name," size: ", blob.size," format: ", blob.format)
-            fits=blob.getblobdata()
-            #print("fits data type: ", type(fits))
-
-        i=0
-        fname="/tmp"
-        fpath = fname
-        while os.path.exists(fpath):
-            i=i+1
-            fname = "image%09d.fits" % i
-            fpath = os.path.join(self.dataDir, fname)
-        ofile = open(fpath, "wb")
-        ofile.write(fits)
-        ofile.close()
-        print("written to file %s" % fname)
-        hdulist = astropy.io.fits.open(fpath)
-        #print(hdulist.info())
-        hdu = hdulist[0]
-        #print(hdu.data.shape)
-        #print(hdu.header)
-        self.curImg = np.asarray(hdu.data,dtype=np.uint16)
-        self.status = self.STATUS_IDLE
 
     def receiveImage(self):
         """ called by indiClient when Blob received
@@ -403,17 +380,17 @@ class Ccd_capture(WebControlClass):
             fits=blob.getblobdata()
             #print("fits data type: ", type(fits))
 
-        i=0
-        fname="/tmp"
-        fpath = fname
-        while os.path.exists(fpath):
-            i=i+1
-            fname = "image%09d.fits" % i
-            fpath = os.path.join(self.dataDir, fname)
-        ofile = open(fpath, "wb")
-        ofile.write(fits)
-        ofile.close()
-        print("written to file %s" % fname)
+        # i=0
+        #fname="/tmp"
+        #fpath = fname
+        #while os.path.exists(fpath):
+        #    i=i+1
+        #    fname = "image%09d.fits" % i
+        #    fpath = os.path.join(self.dataDir, fname)
+        #ofile = open(fpath, "wb")
+        #ofile.write(fits)
+        #ofile.close()
+        #print("written to file %s" % fname)
 
         blobFile = io.BytesIO(fits)
         hdulist = astropy.io.fits.open(blobFile)
@@ -435,8 +412,34 @@ class Ccd_capture(WebControlClass):
         self.curRoiSd = 100 * roiImg.std() / self.curRoiMean
         self.status = self.STATUS_IDLE
         print("curImageTime=%s" % self.curImageTime)
+
+        if (self.autoSave):
+            self.saveImage()
+
+        if (self.continuousMode):
+            self.startExposure()
         
 
+    def saveImage(self):
+        """ Save the current image to disk using the base filename
+        fnameRoot.  The image date/time is also appended to the filename
+        with a further index number if necesssary to ensure it is unique.
+        """
+        i=0
+        imgDt = datetime.fromtimestamp(self.curImageTime)
+        tsStr = imgDt.strftime("%Y%m%d%H%M%S")
+        fname="%s-%s-%03d.tif" % (self.saveFnameRoot,tsStr,i)
+        fpath = os.path.join(self.dataDir, fname)
+        while os.path.exists(fpath):
+            i=i+1
+            fname="%s-%s-%03d.tif" % (self.saveFnameRoot,tsStr,i)
+            fpath = os.path.join(self.dataDir, fname)
+        print("saveImg - Saving to %s.  dataDir=%s" % (fpath,self.dataDir))
+
+        cv2.imwrite(fpath,self.curImg)
+        return("ok")
+        
+        
     def resizeImgForWeb(self,img):
         """ Returns a re-sized image for web viewing """
         xMax = int(self.WEB_X_MAX)
@@ -460,18 +463,12 @@ class Ccd_capture(WebControlClass):
     def getRoiWebImage(self):
         """ return a copy of the current image, scaled to 800 px width
         """
-        roiImg = self.curImg.copy()
+        roiImg = cv2.cvtColor(self.curImg,cv2.COLOR_GRAY2RGB)
         cv2.rectangle(roiImg,
                       (self.roiOriginX, self.roiOriginY),
                       (self.roiOriginX + self.roiSizeX,
                        self.roiOriginY + self.roiSizeY),
-                      (0,0,0),
-                      3)
-        cv2.rectangle(roiImg,
-                      (self.roiOriginX, self.roiOriginY),
-                      (self.roiOriginX + self.roiSizeX+1,
-                       self.roiOriginY + self.roiSizeY+1),
-                      (255,255,255),
+                      (65535,0,0),
                       3)
         res = self.resizeImgForWeb(roiImg)
         success, encImg = cv2.imencode('.png',res)
@@ -677,11 +674,24 @@ class Ccd_capture(WebControlClass):
                 self.startExposure()
                 pass
             elif (cmdStr.lower()=="startContinuousExposures".lower()):
-                print("FIXME - Implement startContinuousExposures")
+                self.continuousMode = True
+                self.startExposure()
                 pass
             elif (cmdStr.lower()=="stopContinuousExposures".lower()):
-                print("FIXME - Implement stopContinuousExposures")
+                self.continuousMode = False
                 pass
+            elif (cmdStr.lower()=="saveImage".lower()):
+                self.saveFnameRoot = valStr
+                self.saveImage()
+                return("ok")
+            elif (cmdStr.lower()=="startAutoSave".lower()):
+                self.saveFnameRoot = valStr
+                self.autoSave = True
+                self.saveImage()
+                return("ok")
+            elif (cmdStr.lower()=="stopAutoSave".lower()):
+                self.autoSave = False
+                return("ok")
             elif (cmdStr.lower()=="setExposureTime".lower()):
                 self.exposureTime = float(valStr)
                 return("ok")
@@ -744,7 +754,7 @@ if __name__ == "__main__":
     print(args)
 
     
-    dataDir = "./data"
+    dataDir = "data"
     if (args['simulator']):
         cameraId = "CCD Simulator"
     else:

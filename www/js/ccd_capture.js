@@ -1,5 +1,6 @@
 
 var lastImageDate = -1;
+var continuousMode = 0;
 
 function getData() {
     $.ajax({url:"/getData",success:updateDashboard});
@@ -22,7 +23,7 @@ function updateDashboard(dataStr) {
 	    var timeStr = hours.substr(-2) + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 	    var imageAge = Math.floor(new Date().getTime()/1000 - val)
 	    var imgSrc = "/getImage?"+ new Date().getTime();
-	    $("#"+key).html(timeStr + " (" + imageAge + " s old) - imgSrc="+ imgSrc);
+	    $("#"+key).html(timeStr + " (" + imageAge + " s old)");
 	    // If we have a new image available, display it, otherwise do not
 	    // refresh preview image to save bandwidth.
 	    if (((val - lastImageDate) > 1) || (lastImageDate==-1)) {
@@ -121,7 +122,50 @@ $(document).ready(function(){
             //alert("data: "+data);
         });
     });
+
+    $("#capture-continuous-btn").click(function(evt) {
+        $('#loading-indicator').show();
+	if (continuousMode == 0){
+	    $("#capture-continuous-btn").html("Stop");
+	    continuousMode = 1;
+            $.post("/startContinuousExposures/", function(data,status) {
+                $('#loading-indicator').hide();
+            //alert("data: "+data);
+            });
+	} else {
+	    $("#capture-continuous-btn").html("Start");
+	    continuousMode = 0;
+            $.post("/stopContinuousExposures/", function(data,status) {
+                $('#loading-indicator').hide();
+	    });
+	}
+    });
     
+    $("#save-image-btn").click(function(evt) {
+        $('#loading-indicator').show();
+	val = $("#fname-input").val()
+        $.post("/saveImage/"+val, function(data,status) {
+            $('#loading-indicator').hide();
+            //alert("data: "+data);
+        });
+    });
+
+    $("#autosave-chk").click(function(evt) {
+        $('#loading-indicator').show();
+	val = $("#fname-input").val()
+	if($("#autosave-chk").is(':checked')) {
+            $.post("/startAutoSave/"+val, function(data,status) {
+		$('#loading-indicator').hide();
+		//alert("data: "+data);
+            });
+	} else {
+            $.post("/stopAutoSave/", function(data,status) {
+		$('#loading-indicator').hide();
+		//alert("data: "+data);
+            });
+	}
+    });
+
     
     setInterval("getData();",1000);
     getData();
