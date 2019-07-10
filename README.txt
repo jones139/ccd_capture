@@ -9,7 +9,27 @@ interface to the camera hardware.
 
 The web interface appears as http://localhost:8081
 
+Installation
+============
+Install the INDI server
+	sudo add-apt-repository ppa:mutlaqja/ppa
+	sudo apt-get update
+	sudo apt install indi-atik indi-full indi-bin libindi-dev
 
+Set up Python environment
+    sudo apt install build-essential python3-pip libz3-dev python-setuptools python-dev libindi-dev swig python3-gi-cairo python3-gi gir1.2-gtk-3.0 pkg-config libcairo-dev libgirepository1.0-dev
+
+***there may be some dependencies I have missed.... ***
+
+	Create and activeate a python3 virtual environment
+	**ADD VIRTUALENV INSTRUCTIONS **
+	pip install pyind-client python-setuptools pytohn-dev libind-dev swig
+	pip install numpy astropy gobject PyGObject opencv-python pypng scipy
+	pip install pdoc3
+
+
+User Instructions
+============
 To start the INDI server run:
    indiserver -vv indi_atik_ccd
 
@@ -39,6 +59,35 @@ The web interface provides the following functions:
 The saved images appear in ./ccd_capture/www/data.
 Note that at the moment we do not provide a function to download the images
 via the web interface.
+
+
+Software Description
+====================
+The interface to the camera is included in the ccd_capture.py file and uses the
+pyIndi library to connect to the INDI server.   We use the astropy.io.fits
+library to interpret the fits data provided by the camera interface.
+
+WebControlClass.py provides a (sort of) abstract class for a web control
+application using the bottle.py framework, and is used as the basis of
+ccd_capture.py
+
+The image analysis and plotting uses opencv and matplotlib.
+
+ccd_capture.py provides a simple REST(ish) interface to the camera.
+The web browser runs www/index.html, which executes javascript code in
+www/js/ccd_capture.js.
+
+The web interface is quite old fashioned - it uses jquery rather than a modern
+javascript framework to make it easier for someone else to work out how it works.
+The style of the web page uses the bootstrap V4 style library.
+
+The javascript performs a getData request on the ccd_capture server every second
+and updates the web page based on the data.
+The onClick events of the various buttons trigger functions that make other API
+calls to ccd_capture to set parameters etc.
+
+Generate the code documentation using
+	 pdoc3 --html -o docs ccd_capture imgAnalyser WebControlClass imgSequenceAnalyser
 
 
 Graham Jones

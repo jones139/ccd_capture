@@ -1,0 +1,2843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.3" />
+<title>ccd_capture API documentation</title>
+<meta name="description" content="Provides a web based front end to a CCD camera, that is controlled
+using the INDI protocol …" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>ccd_capture</code></h1>
+</header>
+<section id="section-intro">
+<p>Provides a web based front end to a CCD camera, that is controlled
+using the INDI protocol.</p>
+<pre><code>   The following commands are recognised:
+   HTTP GET Commands:
+   /getData - returns a JSON string summarising the current state.
+   /getImage - returns a web-scaled version of the latest camera image.
+   /getRoiImage - as for /getImage but the defined ROI is highlighted on the image.
+   /getFullImage - NOT IMPLEMENTED
+   /getFrameHistogram - returns an image of the pixel intensity histogram for the current image.
+   /getRoiHistogram - returns an image of the pixel intensity histogram for the Region of Interest in the current image.
+   /getXProfile - returns an image of a graph showing the intensity of pixels across the X direction at the midpoint of the image in Y.
+   /getRoiXProfile - returns an image of a graph showing the intensity of pixels across the X direction of the region of interest at the midpoint of the image in Y.
+   /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction at the midpoint of the image in X.
+   /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction of the region of interest at the midpoint of the image in X.
+
+   HTTP POST Commands:
+   /startExposure - start a single camera exposure
+   /startContinuousExposures - start collecting repeated camera exposures.
+   /stopContinuousExposures - stop collecting repeated exposures when the current one completes.
+   /saveImage/&lt;fname&gt; - save the current image with the specified filename root.
+   /startAutoSave/&lt;fname&gt; - start auto saving every image that is received with the specified filename root.
+   /stopAutoSave - stop auto saving images.
+   /setExposureTime/&lt;time_secs&gt; - set the camera exposure time to the given time in seconds.
+   /setCooler/&lt;setpoint&gt; - set the cooler setpoint to the given value (in degC)
+   /setSubFrame/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the subframe in camera pixel coordinates.
+   /setRoi/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the ROI in camera pixel coordinates, relative to subFrame origin.
+   /clearRoi - resets the ROI back to the whole subframe.
+</code></pre>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">#
+# ccd_capture.py
+&#39;&#39;&#39; Provides a web based front end to a CCD camera, that is controlled
+ using the INDI protocol.
+
+        The following commands are recognised:
+        HTTP GET Commands:
+        /getData - returns a JSON string summarising the current state.
+        /getImage - returns a web-scaled version of the latest camera image.
+        /getRoiImage - as for /getImage but the defined ROI is highlighted on the image.
+        /getFullImage - NOT IMPLEMENTED
+        /getFrameHistogram - returns an image of the pixel intensity histogram for the current image.
+        /getRoiHistogram - returns an image of the pixel intensity histogram for the Region of Interest in the current image.
+        /getXProfile - returns an image of a graph showing the intensity of pixels across the X direction at the midpoint of the image in Y.
+        /getRoiXProfile - returns an image of a graph showing the intensity of pixels across the X direction of the region of interest at the midpoint of the image in Y.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction at the midpoint of the image in X.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction of the region of interest at the midpoint of the image in X.
+
+        HTTP POST Commands:
+        /startExposure - start a single camera exposure
+        /startContinuousExposures - start collecting repeated camera exposures.
+        /stopContinuousExposures - stop collecting repeated exposures when the current one completes.
+        /saveImage/&lt;fname&gt; - save the current image with the specified filename root.
+        /startAutoSave/&lt;fname&gt; - start auto saving every image that is received with the specified filename root.
+        /stopAutoSave - stop auto saving images.
+        /setExposureTime/&lt;time_secs&gt; - set the camera exposure time to the given time in seconds.
+        /setCooler/&lt;setpoint&gt; - set the cooler setpoint to the given value (in degC)
+        /setSubFrame/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the subframe in camera pixel coordinates.
+        /setRoi/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the ROI in camera pixel coordinates, relative to subFrame origin.
+        /clearRoi - resets the ROI back to the whole subframe.
+
+        &#39;&#39;&#39;
+
+import argparse
+from datetime import datetime
+import time
+import os
+import sys
+import threading
+import json
+import numpy as np
+import io
+import astropy.io.fits
+import PyIndi
+import cv2
+import matplotlib.pyplot as plt
+from WebControlClass import WebControlClass
+
+
+class IndiClient(PyIndi.BaseClient):
+    def __init__(self,imgCallback = None):
+        super(IndiClient, self).__init__()
+        #self.blobEvent=threading.Event()
+        #self.blobEvent.clear()
+        self.imgCallback = imgCallback
+
+    def newDevice(self, d):
+        print(&#34;newDevice:&#34;,d.getDeviceName())
+
+    def newProperty(self, p):
+        print(&#34;New property &#34;, p.getName(), &#34; for device &#34;,
+              p.getDeviceName())
+        if (p.getName() == &#34;CCD_FRAME&#34;):
+            for n in p.getNumber():
+                print(n.name, &#34; = &#34;, n.value)
+    def removeProperty(self, p):
+        pass
+    def newBLOB(self, bp):
+        #global blobEvent
+        print(&#34;new BLOB &#34;, bp.name)
+        #self.blobEvent.set()
+        #blobEvent.set()
+        self.imgCallback()
+
+    def newSwitch(self, svp):
+        pass
+    def newNumber(self, nvp):
+        pass
+    def newText(self, tvp):
+        print(&#34;IndiClient.newText: &#34;,tvp)
+        pass
+    def newLight(self, lvp):
+        pass
+    def newMessage(self, d, m):
+        print(&#34;IndiClient.newMessage: &#34;,m.real)
+        pass
+    def serverConnected(self):
+        print(&#34;serverConnected&#34;)
+
+
+
+
+class Ccd_capture(WebControlClass):
+    &#39;&#39;&#39; 
+    Provide a web interface to a ccd camera using the INDI protocol.
+    &#39;&#39;&#39;
+    STATUS_ERROR = -1
+    STATUS_NO_IMAGE = 0
+    STATUS_IDLE = 1
+    STATUS_EXPOSING = 2
+    STATUS_DOWNLOADING = 3
+
+    WEB_X_MAX = 600
+    WEB_Y_MAX = 400
+    
+    indiConnected = False
+    cameraInitialised = False
+    exposureTime = 0.5  # Exposure time in seconds
+    subFrameOriginX = 0  # Pixels
+    subFrameOriginY = 0  # Pixels
+    subFrameSizeX = 500  # Pixels
+    subFrameSizeY = 500  # Pixels
+    roiOriginX = 0  # Pixels
+    roiOriginY = 0  # Pixels
+    roiSizeX = 100  # Pixels
+    roiSizeY = 100  # Pixels
+    frameSizeX = 0  # Pixels
+    frameSizeY = 0  # Pixels
+    coolerSetpoint = 0.0 # degC
+    coolerOn = False
+    continuousMode = False
+    saveFnameRoot = &#34;fname&#34;
+    autoSave = False
+
+    curImageTime = 0  # Time current image was collected
+
+    curImageMean = -1
+    curImageSd = -1
+    curRoiMean = -1
+    curRoiSd = -1
+
+    status = STATUS_NO_IMAGE
+    errorState = 0  # 0=ok, -1=warning, -2=error
+    msg = &#34;&#34;
+    
+    def __init__(self, cameraId=&#34;Atik 383L&#34;, dataDir = &#34;.&#34;):
+        print(&#34;ccd_capture.__init__()&#34;)
+        WebControlClass.__init__(self,portNo=8081)
+
+        self.cameraId = cameraId
+        self.dataDir = os.path.join(self.wwwPath,dataDir)
+        print(&#34;dataDir=%s&#34; % self.dataDir)
+        self.status = self.STATUS_NO_IMAGE
+
+        if (not os.path.exists(self.dataDir)):
+            os.makedirs(self.dataDir)
+        self.connectINDI(cameraId)
+        
+        self.startServer()
+
+    def toJson(self):
+        obj = {}
+        obj[&#39;statusVal&#39;]=self.status
+        obj[&#39;errorState&#39;]=self.errorState
+        obj[&#39;msg&#39;]=self.msg
+        obj[&#39;cameraId&#39;]=self.cameraId
+        obj[&#39;exposureTime&#39;]=self.exposureTime
+        obj[&#39;subFrameOriginX&#39;]=self.subFrameOriginX
+        obj[&#39;subFrameOriginY&#39;]=self.subFrameOriginY
+        obj[&#39;subFrameSizeX&#39;]=self.subFrameSizeX
+        obj[&#39;subFrameSizeY&#39;]=self.subFrameSizeY
+        obj[&#39;roiOriginX&#39;]=self.roiOriginX
+        obj[&#39;roiOriginY&#39;]=self.roiOriginY
+        obj[&#39;roiSizeX&#39;]=self.roiSizeX
+        obj[&#39;roiSizeY&#39;]=self.roiSizeY
+        obj[&#39;frameSizeX&#39;]=self.frameSizeX
+        obj[&#39;frameSizeY&#39;]=self.frameSizeY
+        obj[&#39;coolerSetpoint&#39;]=self.coolerSetpoint
+        obj[&#39;coolerOn&#39;]=self.coolerOn
+        obj[&#39;curImageTime&#39;]=self.curImageTime
+        obj[&#39;curImageMean&#39;]=&#34;%.1f&#34; % self.curImageMean
+        obj[&#39;curImageSd&#39;]=&#34;%.1f&#34; % self.curImageSd
+        obj[&#39;curRoiMean&#39;]=&#34;%.1f&#34; % self.curRoiMean
+        obj[&#39;curRoiSd&#39;]=&#34;%.1f&#34; % self.curRoiSd
+
+
+        jsonStr = json.dumps(obj,indent=2,sort_keys=True)
+        #print jsonStr
+        return jsonStr
+
+
+    def initialiseCamera(self):
+        &#34;&#34;&#34; Query the INDI Server to get the current camera settings.
+        Sets the sub frame to be the full frame.
+        &#34;&#34;&#34;
+        pass
+
+
+    def initialiseTelescopeSimulator(self):
+        # connect the scope
+        telescope=&#34;Telescope Simulator&#34;
+        device_telescope=None
+        telescope_connect=None
+
+        # get the telescope device
+        device_telescope=self.indiclient.getDevice(telescope)
+        while not(device_telescope):
+            time.sleep(0.5)
+            device_telescope=self.indiclient.getDevice(telescope)
+            
+        # wait CONNECTION property be defined for telescope
+        telescope_connect=device_telescope.getSwitch(&#34;CONNECTION&#34;)
+        while not(telescope_connect):
+            time.sleep(0.5)
+            telescope_connect=device_telescope.getSwitch(&#34;CONNECTION&#34;)
+
+        # if the telescope device is not connected, we do connect it
+        if not(device_telescope.isConnected()):
+            # Property vectors are mapped to iterable Python objects
+            # Hence we can access each element of the vector using Python indexing
+            # each element of the &#34;CONNECTION&#34; vector is a ISwitch
+            telescope_connect[0].s=PyIndi.ISS_ON  # the &#34;CONNECT&#34; switch
+            telescope_connect[1].s=PyIndi.ISS_OFF # the &#34;DISCONNECT&#34; switch
+            self.indiclient.sendNewSwitch(telescope_connect) # send this new value to the device
+                
+        # Now let&#39;s make a goto to vega
+        # Beware that ra/dec are in decimal hours/degrees
+        vega={&#39;ra&#39;: (279.23473479 * 24.0)/360.0, &#39;dec&#39;: +38.78368896 }
+
+        # We want to set the ON_COORD_SET switch to engage tracking after goto
+        # device.getSwitch is a helper to retrieve a property vector
+        telescope_on_coord_set=device_telescope.getSwitch(&#34;ON_COORD_SET&#34;)
+        while not(telescope_on_coord_set):
+            time.sleep(0.5)
+            telescope_on_coord_set=device_telescope.getSwitch(&#34;ON_COORD_SET&#34;)
+        # the order below is defined in the property vector, look at the standard Properties page
+        # or enumerate them in the Python shell when you&#39;re developing your program
+        telescope_on_coord_set[0].s=PyIndi.ISS_ON  # TRACK
+        telescope_on_coord_set[1].s=PyIndi.ISS_OFF # SLEW
+        telescope_on_coord_set[2].s=PyIndi.ISS_OFF # SYNC
+        self.indiclient.sendNewSwitch(telescope_on_coord_set)
+        # We set the desired coordinates
+        telescope_radec=device_telescope.getNumber(&#34;EQUATORIAL_EOD_COORD&#34;)
+        while not(telescope_radec):
+            time.sleep(0.5)
+            telescope_radec=device_telescope.getNumber(&#34;EQUATORIAL_EOD_COORD&#34;)
+        telescope_radec[0].value=vega[&#39;ra&#39;]
+        telescope_radec[1].value=vega[&#39;dec&#39;]
+        self.indiclient.sendNewNumber(telescope_radec)
+        # and wait for the scope has finished moving
+        while (telescope_radec.s==PyIndi.IPS_BUSY):
+            print(&#34;Scope Moving &#34;, telescope_radec[0].value, telescope_radec[1].value)
+            time.sleep(2)
+
+
+
+
+    def connectINDI(self, cameraId=&#34;Atik 383L&#34;):
+        self.indiclient=IndiClient(self.receiveImage)
+        self.indiclient.setServer(&#34;localhost&#34;,7624)
+
+        if (not(self.indiclient.connectServer())):
+            self.msg = &#34;No indiserver running on &#34;+ \
+                   self.indiclient.getHost()+&#34;:&#34;+ \
+                   str(self.indiclient.getPort())+ \
+                   &#34; - Try to run indiserver -vv indi_atik_ccd&#34; 
+            print(self.msg)
+            self.errorState = -2
+            return
+        else:
+            print(&#34;Server Connected OK&#34;)
+
+        if (cameraId == &#34;CCD Simulator&#34;):
+            print(&#34;Using CCD Simulator, so enabling telescope simulator too&#34;)
+            self.initialiseTelescopeSimulator()
+            
+        print(&#34;Looking for device %s....&#34; % cameraId)
+        self.device_ccd=self.indiclient.getDevice(cameraId)
+        print(&#34;returned from getDevice&#34;)
+        while not(self.device_ccd):
+            time.sleep(0.5)
+            self.device_ccd=self.indiclient.getDevice(cameraId)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;\nFound device!&#34;)
+
+        print(&#34;Connecting to Device&#34;)
+        self.ccd_connect=self.device_ccd.getSwitch(&#34;CONNECTION&#34;)
+        while not(self.ccd_connect):
+            time.sleep(0.5)
+            self.ccd_connect=self.device_ccd.getSwitch(&#34;CONNECTION&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;\nConnected!&#34;)
+        if not(self.device_ccd.isConnected()):
+            print(&#34;oh no - isConnected is false - fiddling...&#34;)
+            self.ccd_connect[0].s=PyIndi.ISS_ON  # the &#34;CONNECT&#34; switch
+            self.ccd_connect[1].s=PyIndi.ISS_OFF # the &#34;DISCONNECT&#34; switch
+            self.indiclient.sendNewSwitch(self.ccd_connect)
+
+        print(&#34;Getting Exposure Object..&#34;)
+        self.ccd_exposure=self.device_ccd.getNumber(&#34;CCD_EXPOSURE&#34;)
+        while not(self.ccd_exposure):
+            time.sleep(0.5)
+            self.ccd_exposure=self.device_ccd.getNumber(&#34;CCD_EXPOSURE&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;got exposure object &#34;, self.ccd_exposure)
+
+        self.getFrame()
+        self.getSubFrame()
+        
+        # we should inform the indi server that we want to receive the
+        # &#34;CCD1&#34; blob from this device
+        print(&#34;Setting BLOB Mode&#34;)
+        self.indiclient.setBLOBMode(PyIndi.B_ALSO, cameraId, &#34;CCD1&#34;)
+
+        self.indiConnected = True;
+
+        self.msg = &#34;ConnectINDI Complete&#34;
+        self.errorState = 0
+        print(self.msg)
+
+
+    def getFrame(self):
+        &#34;&#34;&#34; Populates this object with the current frame dimensions
+        in the camera.
+        &#34;&#34;&#34;
+        print(&#34;Getting CCD_INFO Object..&#34;)
+        ccd_info=self.device_ccd.getNumber(&#34;CCD_INFO&#34;)
+        while not(ccd_info):
+            time.sleep(0.5)
+            ccd_info=self.device_ccd.getNumber(&#34;CCD_INFO&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;got ccd_info object &#34;, ccd_info)
+        for n in ccd_info:
+            print(n.name,&#34; = &#34;,n.value)
+        self.frameSizeX = ccd_info[0].value
+        self.frameSizeY = ccd_info[1].value
+        print(&#34;getFrame Complete&#34;)
+
+    def getSubFrame(self):
+        &#34;&#34;&#34; Populates this object with the current subframe dimensions
+        in the camera.
+        &#34;&#34;&#34;
+        print(&#34;Getting Frame Object..&#34;)
+        ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+        while not(ccd_frame):
+            time.sleep(0.5)
+            ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;got frame object &#34;, ccd_frame)
+        for n in ccd_frame:
+            print(n.name,&#34; = &#34;,n.value)
+        self.subFrameOriginX = ccd_frame[0].value
+        self.subFrameOriginY = ccd_frame[1].value
+        self.subFrameSizeX = ccd_frame[2].value
+        self.subFrameSizeY = ccd_frame[3].value
+        print(&#34;getSubFrame complete&#34;)
+
+    def setSubFrame(self):
+        &#34;&#34;&#34; sets the camera frame dimensions based on the properties
+        of this object.
+        &#34;&#34;&#34;
+        print(&#34;Getting Frame Object..&#34;)
+        ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+        while not(ccd_frame):
+            time.sleep(0.5)
+            ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;got frame object &#34;, ccd_frame)
+        for n in ccd_frame:
+            print(n.name,&#34; = &#34;,n.value)
+        ccd_frame[0].value = self.subFrameOriginX
+        ccd_frame[1].value = self.subFrameOriginY
+        ccd_frame[2].value = self.subFrameSizeX
+        ccd_frame[3].value = self.subFrameSizeY
+        self.indiclient.sendNewNumber(ccd_frame)
+        print(&#34;setFrame complete&#34;)
+
+        
+    def startExposure(self):
+        &#34;&#34;&#34; Request the camera to start an exposure &#34;&#34;&#34;
+        print(&#34;startExposure()&#34;)
+        if not self.indiConnected:
+            self.connectINDI()
+
+        print(&#34;Getting Blob&#34;)
+        self.ccd_ccd1=self.device_ccd.getBLOB(&#34;CCD1&#34;)
+        while not(self.ccd_ccd1):
+            time.sleep(0.5)
+            self.ccd_ccd1=self.device_ccd.getBLOB(&#34;CCD1&#34;)
+            sys.stderr.write(&#34;.&#34;)
+
+        print(&#34;got Blob&#34;)
+
+        #self.indiclient.blobEvent.clear()
+        # global blobEvent
+        # blobEvent=threading.Event()
+        # blobEvent.clear()
+        
+        print(&#34;Sending exposure object...&#34;)
+        self.status = self.STATUS_EXPOSING
+        self.ccd_exposure[0].value=self.exposureTime
+        #print(&#34;Setting exposure to %s&#34; % self.ccd_exposure[0])
+        self.indiclient.sendNewNumber(self.ccd_exposure)
+        #print(&#34;waiting for Image Data....&#34;)
+        #blobEvent.wait()
+
+        print(&#34;startExposure Complete&#34;)
+
+
+
+    def receiveImage(self):
+        &#34;&#34;&#34; called by indiClient when Blob received
+        Memory based file handling from https://www.indilib.org/forum/general/606-take-image-with-python-script/3189.html?start=12
+        &#34;&#34;&#34;
+        print(&#34;receiveImage()&#34;)
+        for blob in self.ccd_ccd1:
+            #print(&#34;name: &#34;, blob.name,&#34; size: &#34;, blob.size,&#34; format: &#34;, blob.format)
+            fits=blob.getblobdata()
+            #print(&#34;fits data type: &#34;, type(fits))
+
+        # i=0
+        #fname=&#34;/tmp&#34;
+        #fpath = fname
+        #while os.path.exists(fpath):
+        #    i=i+1
+        #    fname = &#34;image%09d.fits&#34; % i
+        #    fpath = os.path.join(self.dataDir, fname)
+        #ofile = open(fpath, &#34;wb&#34;)
+        #ofile.write(fits)
+        #ofile.close()
+        #print(&#34;written to file %s&#34; % fname)
+
+        blobFile = io.BytesIO(fits)
+        hdulist = astropy.io.fits.open(blobFile)
+        #print(hdulist.info())
+        hdu = hdulist[0]
+        #print(hdu.data.shape)
+        #print(hdu.header)
+        self.curImg = np.asarray(hdu.data,dtype=np.uint16)
+        self.curImageTime = datetime.now().timestamp()
+        self.curImageMean = self.curImg.mean()
+        self.curImageSd = 100 * self.curImg.std() / self.curImageMean
+
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+
+        self.curRoiMean = roiImg.mean()
+        self.curRoiSd = 100 * roiImg.std() / self.curRoiMean
+        self.status = self.STATUS_IDLE
+        print(&#34;curImageTime=%s&#34; % self.curImageTime)
+
+        if (self.autoSave):
+            self.saveImage()
+
+        if (self.continuousMode):
+            self.startExposure()
+        
+
+    def saveImage(self):
+        &#34;&#34;&#34; Save the current image to disk using the base filename
+        fnameRoot.  The image date/time is also appended to the filename
+        with a further index number if necesssary to ensure it is unique.
+        &#34;&#34;&#34;
+        i=0
+        imgDt = datetime.fromtimestamp(self.curImageTime)
+        tsStr = imgDt.strftime(&#34;%Y%m%d%H%M%S&#34;)
+        fname=&#34;%s-%s-%03d.tif&#34; % (self.saveFnameRoot,tsStr,i)
+        fpath = os.path.join(self.dataDir, fname)
+        while os.path.exists(fpath):
+            i=i+1
+            fname=&#34;%s-%s-%03d.tif&#34; % (self.saveFnameRoot,tsStr,i)
+            fpath = os.path.join(self.dataDir, fname)
+        print(&#34;saveImg - Saving to %s.  dataDir=%s&#34; % (fpath,self.dataDir))
+
+        cv2.imwrite(fpath,self.curImg)
+        return(&#34;ok&#34;)
+        
+        
+    def resizeImgForWeb(self,img):
+        &#34;&#34;&#34; Returns a re-sized image for web viewing &#34;&#34;&#34;
+        xMax = int(self.WEB_X_MAX)
+        yMax = int(img.shape[0] * xMax / img.shape[1])
+
+        if (yMax &gt; self.WEB_Y_MAX):
+            yMax = int(self.WEB_Y_MAX)
+            xMax = int(img.shape[1] * yMax / img.shape[0])
+        res = cv2.resize(img, dsize=(xMax,yMax),
+                         interpolation=cv2.INTER_CUBIC)
+        return(res)
+
+    def getWebImage(self):
+        &#34;&#34;&#34; return a copy of the current image, scaled to 800 px width
+        &#34;&#34;&#34;
+        res = self.resizeImgForWeb(self.curImg)
+        success, encImg = cv2.imencode(&#39;.png&#39;,res)
+        imgBytes = encImg.tobytes()
+        return(imgBytes)
+
+    def getRoiWebImage(self):
+        &#34;&#34;&#34; return a copy of the current image, scaled to 800 px width
+        &#34;&#34;&#34;
+        roiImg = cv2.cvtColor(self.curImg,cv2.COLOR_GRAY2RGB)
+        cv2.rectangle(roiImg,
+                      (self.roiOriginX, self.roiOriginY),
+                      (self.roiOriginX + self.roiSizeX,
+                       self.roiOriginY + self.roiSizeY),
+                      (65535,0,0),
+                      3)
+        res = self.resizeImgForWeb(roiImg)
+        success, encImg = cv2.imencode(&#39;.png&#39;,res)
+        imgBytes = encImg.tobytes()
+        return(imgBytes)
+
+    
+    def getFrameHistogram(self):
+        &#34;&#34;&#34; get an image of the histogram of the current image.
+        &#34;&#34;&#34;
+        histData, bins = np.histogram(self.curImg,256)
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(histData)
+        ax.plot(histData)
+        ax.set_title(&#34;Intensity Histogram&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;hist.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+    def getRoiHistogram(self):
+        &#34;&#34;&#34; get an image of the histogram of the current image ROI.
+        &#34;&#34;&#34;
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+        histData, bins = np.histogram(roiImg,256)
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(histData)
+        ax.plot(histData)
+        ax.set_title(&#34;ROI Intensity Histogram&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;hist.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+    
+    def getXProfile(self):
+        &#34;&#34;&#34; get an image of the X profile chart
+        &#34;&#34;&#34;
+        midY = int(self.curImg.shape[0]/2)
+        intProfile = self.curImg[midY,:]
+        xData = np.linspace(0,self.curImg.shape[1]-1,self.curImg.shape[1])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title(&#34;X Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;xProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+    def getRoiXProfile(self):
+        &#34;&#34;&#34; get an image of the ROI X profile chart
+        &#34;&#34;&#34;
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+        midY = int(roiImg.shape[0]/2)
+        intProfile = roiImg[midY,:]
+        xData = np.linspace(0,roiImg.shape[1]-1,roiImg.shape[1])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title(&#34;ROI X Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;roiXProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+    
+    def getYProfile(self):
+        &#34;&#34;&#34; get an image of the Y profile chart
+        &#34;&#34;&#34;
+        midX = int(self.curImg.shape[1]/2)
+        intProfile = self.curImg[:,midX]
+        xData = np.linspace(0,self.curImg.shape[0]-1,self.curImg.shape[0])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title(&#34;Y Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;yProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+
+        return(histImg)
+    
+    def getRoiYProfile(self):
+        &#34;&#34;&#34; get an image of the Y profile chart
+        &#34;&#34;&#34;
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+        midX = int(roiImg.shape[1]/2)
+        intProfile = roiImg[:,midX]
+        xData = np.linspace(0,roiImg.shape[0]-1,roiImg.shape[0])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title(&#34;ROI Y Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;roiYProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+
+        return(histImg)
+    
+        
+    def onWwwCmd(self,cmdStr,valStr, methodStr,request):
+        &#39;&#39;&#39; Process the command, with parameter &#39;valStr&#39; using request
+        method methodStr, and return the appropriate response.
+        request is the bottlepy request associated with the command.
+        The following commands are recognised:
+        HTTP GET Commands:
+        /getData - returns a JSON string summarising the current state.
+        /getImage - returns a web-scaled version of the latest camera image.
+        /getRoiImage - as for /getImage but the defined ROI is highlighted on the image.
+        /getFullImage - NOT IMPLEMENTED
+        /getFrameHistogram - returns an image of the pixel intensity histogram for the current image.
+        /getRoiHistogram - returns an image of the pixel intensity histogram for the Region of Interest in the current image.
+        /getXProfile - returns an image of a graph showing the intensity of pixels across the X direction at the midpoint of the image in Y.
+        /getRoiXProfile - returns an image of a graph showing the intensity of pixels across the X direction of the region of interest at the midpoint of the image in Y.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction at the midpoint of the image in X.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction of the region of interest at the midpoint of the image in X.
+
+        HTTP POST Commands:
+        /startExposure - start a single camera exposure
+        /startContinuousExposures - start collecting repeated camera exposures.
+        /stopContinuousExposures - stop collecting repeated exposures when the current one completes.
+        /saveImage/&lt;fname&gt; - save the current image with the specified filename root.
+        /startAutoSave/&lt;fname&gt; - start auto saving every image that is received with the specified filename root.
+        /stopAutoSave - stop auto saving images.
+        /setExposureTime/&lt;time_secs&gt; - set the camera exposure time to the given time in seconds.
+        /setCooler/&lt;setpoint&gt; - set the cooler setpoint to the given value (in degC)
+        /setSubFrame/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the subframe in camera pixel coordinates.
+        /setRoi/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the ROI in camera pixel coordinates, relative to subFrame origin.
+        /clearRoi - resets the ROI back to the whole subframe.
+
+        &#39;&#39;&#39;
+        print(&#34;CcdCapture.onWwwCmd(%s/%s %s)&#34; % (cmdStr,valStr,methodStr))
+
+        if (methodStr==&#34;GET&#34;):
+            if (cmdStr.lower()==&#34;getData&#34;.lower()):
+                return self.toJson()
+            elif (cmdStr.lower()==&#34;getImage&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getImage(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    # response.set_header(&#39;Content-type&#39;, &#39;image/png&#39;)
+                    img = self.getWebImage()
+                    #print(&#34;getImage: img=&#34;,img)
+                    return(img)
+            elif (cmdStr.lower()==&#34;getRoiImage&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getRoiImage(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    # response.set_header(&#39;Content-type&#39;, &#39;image/png&#39;)
+                    img = self.getRoiWebImage()
+                    #print(&#34;getRoi Image: img=&#34;,img)
+                    return(img)
+            elif (cmdStr.lower()==&#34;getFullImage&#34;.lower()):
+                print(&#34;FIXME - Implement getFullImage&#34;)
+            elif (cmdStr.lower()==&#34;getFrameHistogram&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getFrameHistogram(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getFrameHistogram()
+                    return(img)
+            elif (cmdStr.lower()==&#34;getXProfile&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getXProfile(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getXProfile()
+                    return(img)
+            elif (cmdStr.lower()==&#34;getYProfile&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getYProfile(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getYProfile()
+                    return(img)
+
+            elif (cmdStr.lower()==&#34;getRoiHistogram&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getRoiHistogram(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getRoiHistogram()
+                    return(img)
+            elif (cmdStr.lower()==&#34;getRoiXProfile&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getRoiXProfile(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getRoiXProfile()
+                    return(img)
+            elif (cmdStr.lower()==&#34;getRoiYProfile&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getRoiYProfile(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getRoiYProfile()
+                    return(img)
+
+
+            else:
+                print(&#34;ERROR - Unreconised Command %s&#34; % cmdStr)
+                return(&#34;&lt;h1&gt;ERROR - Unreconised Command %s&lt;/h1&gt;&#34; % cmdStr)
+        elif (methodStr==&#34;POST&#34;):
+            if (cmdStr.lower()==&#34;startExposure&#34;.lower()):
+                print(&#34;FIXME - Implement startExposure&#34;)
+                self.startExposure()
+                pass
+            elif (cmdStr.lower()==&#34;startContinuousExposures&#34;.lower()):
+                self.continuousMode = True
+                self.startExposure()
+                pass
+            elif (cmdStr.lower()==&#34;stopContinuousExposures&#34;.lower()):
+                self.continuousMode = False
+                pass
+            elif (cmdStr.lower()==&#34;saveImage&#34;.lower()):
+                self.saveFnameRoot = valStr
+                self.saveImage()
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;startAutoSave&#34;.lower()):
+                self.saveFnameRoot = valStr
+                self.autoSave = True
+                self.saveImage()
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;stopAutoSave&#34;.lower()):
+                self.autoSave = False
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;setExposureTime&#34;.lower()):
+                self.exposureTime = float(valStr)
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;setCooler&#34;.lower()):
+                self.coolerSetpoint = float(valStr)
+                self.coolerOn = True
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;setSubFrame&#34;.lower()):
+                origin, size =  valStr.split(&#34;:&#34;)
+                print(origin,size)
+                self.subFrameOriginX = int(origin.split(&#34;,&#34;)[0])
+                self.subFrameOriginY = int(origin.split(&#34;,&#34;)[1])
+                self.subFrameSizeX   = int(size.split(&#34;,&#34;)[0])
+                self.subFrameSizeY   = int(size.split(&#34;,&#34;)[1])
+                self.setSubFrame()
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;setRoi&#34;.lower()):
+                origin, size =  valStr.split(&#34;:&#34;)
+                print(origin,size)
+                self.roiOriginX = int(origin.split(&#34;,&#34;)[0])
+                self.roiOriginY = int(origin.split(&#34;,&#34;)[1])
+                self.roiSizeX   = int(size.split(&#34;,&#34;)[0])
+                self.roiSizeY   = int(size.split(&#34;,&#34;)[1])
+
+                if (self.roiOriginX + self.roiSizeX &gt; self.subFrameSizeX):
+                    self.roiSizeX = self.subFrameSizeX - self.roiOriginX
+                    print(&#34;Clipped ROI to fit in subFrame - X&#34;)
+                if (self.roiOriginY + self.roiSizeY &gt; self.subFrameSizeY):
+                    self.roiSizeY = self.subFrameSizeY - self.roiOriginY
+                    print(&#34;Clipped ROI to fit in subFrame - Y&#34;)
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;clearRoi&#34;.lower()):
+                self.roiOriginX = self.subFrameOriginX
+                self.roiOriginY = self.subFrameOriginY
+                self.roiSizeX   = self.subFrameSizeX
+                self.roiSizeY   = self.subFrameSizeY
+            else:                
+                print(&#34;ERROR - Unreconised Command %s&#34; % cmdStr)
+                return(&#34;&lt;h1&gt;ERROR - Unreconised Command %s&lt;/h1&gt;&#34; % cmdStr)
+        else:
+            print(&#34;ccd_capture.onWwwCmd - Unsupported Method type, %s.&#34; % methodStr)
+            return(&#39;ERROR - Unsupported Method Type %s&#39; % methodStr)
+        
+        return(&#39;&lt;h1&gt;ccd_capture.onWwwCmd - FIXME&lt;/h1&gt;&#39;
+               &#39;We should not see this message!!!&#39;
+               &#39;&lt;br/&gt;cmdStr=%s/%s, method=%s&#39; % (cmdStr,valStr,methodStr))
+
+
+
+if __name__ == &#34;__main__&#34;:
+    print(&#34;ccd_capture.__main__()&#34;)
+
+
+    parser = argparse.ArgumentParser(description=&#39;CCD Camera Server&#39;)
+    parser.add_argument(&#39;--sim&#39;, dest=&#39;simulator&#39;, action=&#39;store_true&#39;,
+                        help=&#39;Use the simulator rather than the real camera&#39;)
+
+    argsNamespace = parser.parse_args()
+    args = vars(argsNamespace)
+    print(args)
+
+    
+    dataDir = &#34;data&#34;
+    if (args[&#39;simulator&#39;]):
+        cameraId = &#34;CCD Simulator&#34;
+    else:
+        cameraId = &#34;Atik 383L&#34;
+    ccdCapture = Ccd_capture(cameraId, dataDir)
+    print(&#34;Ccd_capture complete&#34;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ccd_capture.Ccd_capture"><code class="flex name class">
+<span>class <span class="ident">Ccd_capture</span></span>
+<span>(</span><span>cameraId='Atik 383L', dataDir='.')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Provide a web interface to a ccd camera using the INDI protocol.</p>
+<p>Initialise this WebControlClass to serve data on port Number
+portNo (default = 8080.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class Ccd_capture(WebControlClass):
+    &#39;&#39;&#39; 
+    Provide a web interface to a ccd camera using the INDI protocol.
+    &#39;&#39;&#39;
+    STATUS_ERROR = -1
+    STATUS_NO_IMAGE = 0
+    STATUS_IDLE = 1
+    STATUS_EXPOSING = 2
+    STATUS_DOWNLOADING = 3
+
+    WEB_X_MAX = 600
+    WEB_Y_MAX = 400
+    
+    indiConnected = False
+    cameraInitialised = False
+    exposureTime = 0.5  # Exposure time in seconds
+    subFrameOriginX = 0  # Pixels
+    subFrameOriginY = 0  # Pixels
+    subFrameSizeX = 500  # Pixels
+    subFrameSizeY = 500  # Pixels
+    roiOriginX = 0  # Pixels
+    roiOriginY = 0  # Pixels
+    roiSizeX = 100  # Pixels
+    roiSizeY = 100  # Pixels
+    frameSizeX = 0  # Pixels
+    frameSizeY = 0  # Pixels
+    coolerSetpoint = 0.0 # degC
+    coolerOn = False
+    continuousMode = False
+    saveFnameRoot = &#34;fname&#34;
+    autoSave = False
+
+    curImageTime = 0  # Time current image was collected
+
+    curImageMean = -1
+    curImageSd = -1
+    curRoiMean = -1
+    curRoiSd = -1
+
+    status = STATUS_NO_IMAGE
+    errorState = 0  # 0=ok, -1=warning, -2=error
+    msg = &#34;&#34;
+    
+    def __init__(self, cameraId=&#34;Atik 383L&#34;, dataDir = &#34;.&#34;):
+        print(&#34;ccd_capture.__init__()&#34;)
+        WebControlClass.__init__(self,portNo=8081)
+
+        self.cameraId = cameraId
+        self.dataDir = os.path.join(self.wwwPath,dataDir)
+        print(&#34;dataDir=%s&#34; % self.dataDir)
+        self.status = self.STATUS_NO_IMAGE
+
+        if (not os.path.exists(self.dataDir)):
+            os.makedirs(self.dataDir)
+        self.connectINDI(cameraId)
+        
+        self.startServer()
+
+    def toJson(self):
+        obj = {}
+        obj[&#39;statusVal&#39;]=self.status
+        obj[&#39;errorState&#39;]=self.errorState
+        obj[&#39;msg&#39;]=self.msg
+        obj[&#39;cameraId&#39;]=self.cameraId
+        obj[&#39;exposureTime&#39;]=self.exposureTime
+        obj[&#39;subFrameOriginX&#39;]=self.subFrameOriginX
+        obj[&#39;subFrameOriginY&#39;]=self.subFrameOriginY
+        obj[&#39;subFrameSizeX&#39;]=self.subFrameSizeX
+        obj[&#39;subFrameSizeY&#39;]=self.subFrameSizeY
+        obj[&#39;roiOriginX&#39;]=self.roiOriginX
+        obj[&#39;roiOriginY&#39;]=self.roiOriginY
+        obj[&#39;roiSizeX&#39;]=self.roiSizeX
+        obj[&#39;roiSizeY&#39;]=self.roiSizeY
+        obj[&#39;frameSizeX&#39;]=self.frameSizeX
+        obj[&#39;frameSizeY&#39;]=self.frameSizeY
+        obj[&#39;coolerSetpoint&#39;]=self.coolerSetpoint
+        obj[&#39;coolerOn&#39;]=self.coolerOn
+        obj[&#39;curImageTime&#39;]=self.curImageTime
+        obj[&#39;curImageMean&#39;]=&#34;%.1f&#34; % self.curImageMean
+        obj[&#39;curImageSd&#39;]=&#34;%.1f&#34; % self.curImageSd
+        obj[&#39;curRoiMean&#39;]=&#34;%.1f&#34; % self.curRoiMean
+        obj[&#39;curRoiSd&#39;]=&#34;%.1f&#34; % self.curRoiSd
+
+
+        jsonStr = json.dumps(obj,indent=2,sort_keys=True)
+        #print jsonStr
+        return jsonStr
+
+
+    def initialiseCamera(self):
+        &#34;&#34;&#34; Query the INDI Server to get the current camera settings.
+        Sets the sub frame to be the full frame.
+        &#34;&#34;&#34;
+        pass
+
+
+    def initialiseTelescopeSimulator(self):
+        # connect the scope
+        telescope=&#34;Telescope Simulator&#34;
+        device_telescope=None
+        telescope_connect=None
+
+        # get the telescope device
+        device_telescope=self.indiclient.getDevice(telescope)
+        while not(device_telescope):
+            time.sleep(0.5)
+            device_telescope=self.indiclient.getDevice(telescope)
+            
+        # wait CONNECTION property be defined for telescope
+        telescope_connect=device_telescope.getSwitch(&#34;CONNECTION&#34;)
+        while not(telescope_connect):
+            time.sleep(0.5)
+            telescope_connect=device_telescope.getSwitch(&#34;CONNECTION&#34;)
+
+        # if the telescope device is not connected, we do connect it
+        if not(device_telescope.isConnected()):
+            # Property vectors are mapped to iterable Python objects
+            # Hence we can access each element of the vector using Python indexing
+            # each element of the &#34;CONNECTION&#34; vector is a ISwitch
+            telescope_connect[0].s=PyIndi.ISS_ON  # the &#34;CONNECT&#34; switch
+            telescope_connect[1].s=PyIndi.ISS_OFF # the &#34;DISCONNECT&#34; switch
+            self.indiclient.sendNewSwitch(telescope_connect) # send this new value to the device
+                
+        # Now let&#39;s make a goto to vega
+        # Beware that ra/dec are in decimal hours/degrees
+        vega={&#39;ra&#39;: (279.23473479 * 24.0)/360.0, &#39;dec&#39;: +38.78368896 }
+
+        # We want to set the ON_COORD_SET switch to engage tracking after goto
+        # device.getSwitch is a helper to retrieve a property vector
+        telescope_on_coord_set=device_telescope.getSwitch(&#34;ON_COORD_SET&#34;)
+        while not(telescope_on_coord_set):
+            time.sleep(0.5)
+            telescope_on_coord_set=device_telescope.getSwitch(&#34;ON_COORD_SET&#34;)
+        # the order below is defined in the property vector, look at the standard Properties page
+        # or enumerate them in the Python shell when you&#39;re developing your program
+        telescope_on_coord_set[0].s=PyIndi.ISS_ON  # TRACK
+        telescope_on_coord_set[1].s=PyIndi.ISS_OFF # SLEW
+        telescope_on_coord_set[2].s=PyIndi.ISS_OFF # SYNC
+        self.indiclient.sendNewSwitch(telescope_on_coord_set)
+        # We set the desired coordinates
+        telescope_radec=device_telescope.getNumber(&#34;EQUATORIAL_EOD_COORD&#34;)
+        while not(telescope_radec):
+            time.sleep(0.5)
+            telescope_radec=device_telescope.getNumber(&#34;EQUATORIAL_EOD_COORD&#34;)
+        telescope_radec[0].value=vega[&#39;ra&#39;]
+        telescope_radec[1].value=vega[&#39;dec&#39;]
+        self.indiclient.sendNewNumber(telescope_radec)
+        # and wait for the scope has finished moving
+        while (telescope_radec.s==PyIndi.IPS_BUSY):
+            print(&#34;Scope Moving &#34;, telescope_radec[0].value, telescope_radec[1].value)
+            time.sleep(2)
+
+
+
+
+    def connectINDI(self, cameraId=&#34;Atik 383L&#34;):
+        self.indiclient=IndiClient(self.receiveImage)
+        self.indiclient.setServer(&#34;localhost&#34;,7624)
+
+        if (not(self.indiclient.connectServer())):
+            self.msg = &#34;No indiserver running on &#34;+ \
+                   self.indiclient.getHost()+&#34;:&#34;+ \
+                   str(self.indiclient.getPort())+ \
+                   &#34; - Try to run indiserver -vv indi_atik_ccd&#34; 
+            print(self.msg)
+            self.errorState = -2
+            return
+        else:
+            print(&#34;Server Connected OK&#34;)
+
+        if (cameraId == &#34;CCD Simulator&#34;):
+            print(&#34;Using CCD Simulator, so enabling telescope simulator too&#34;)
+            self.initialiseTelescopeSimulator()
+            
+        print(&#34;Looking for device %s....&#34; % cameraId)
+        self.device_ccd=self.indiclient.getDevice(cameraId)
+        print(&#34;returned from getDevice&#34;)
+        while not(self.device_ccd):
+            time.sleep(0.5)
+            self.device_ccd=self.indiclient.getDevice(cameraId)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;\nFound device!&#34;)
+
+        print(&#34;Connecting to Device&#34;)
+        self.ccd_connect=self.device_ccd.getSwitch(&#34;CONNECTION&#34;)
+        while not(self.ccd_connect):
+            time.sleep(0.5)
+            self.ccd_connect=self.device_ccd.getSwitch(&#34;CONNECTION&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;\nConnected!&#34;)
+        if not(self.device_ccd.isConnected()):
+            print(&#34;oh no - isConnected is false - fiddling...&#34;)
+            self.ccd_connect[0].s=PyIndi.ISS_ON  # the &#34;CONNECT&#34; switch
+            self.ccd_connect[1].s=PyIndi.ISS_OFF # the &#34;DISCONNECT&#34; switch
+            self.indiclient.sendNewSwitch(self.ccd_connect)
+
+        print(&#34;Getting Exposure Object..&#34;)
+        self.ccd_exposure=self.device_ccd.getNumber(&#34;CCD_EXPOSURE&#34;)
+        while not(self.ccd_exposure):
+            time.sleep(0.5)
+            self.ccd_exposure=self.device_ccd.getNumber(&#34;CCD_EXPOSURE&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;got exposure object &#34;, self.ccd_exposure)
+
+        self.getFrame()
+        self.getSubFrame()
+        
+        # we should inform the indi server that we want to receive the
+        # &#34;CCD1&#34; blob from this device
+        print(&#34;Setting BLOB Mode&#34;)
+        self.indiclient.setBLOBMode(PyIndi.B_ALSO, cameraId, &#34;CCD1&#34;)
+
+        self.indiConnected = True;
+
+        self.msg = &#34;ConnectINDI Complete&#34;
+        self.errorState = 0
+        print(self.msg)
+
+
+    def getFrame(self):
+        &#34;&#34;&#34; Populates this object with the current frame dimensions
+        in the camera.
+        &#34;&#34;&#34;
+        print(&#34;Getting CCD_INFO Object..&#34;)
+        ccd_info=self.device_ccd.getNumber(&#34;CCD_INFO&#34;)
+        while not(ccd_info):
+            time.sleep(0.5)
+            ccd_info=self.device_ccd.getNumber(&#34;CCD_INFO&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;got ccd_info object &#34;, ccd_info)
+        for n in ccd_info:
+            print(n.name,&#34; = &#34;,n.value)
+        self.frameSizeX = ccd_info[0].value
+        self.frameSizeY = ccd_info[1].value
+        print(&#34;getFrame Complete&#34;)
+
+    def getSubFrame(self):
+        &#34;&#34;&#34; Populates this object with the current subframe dimensions
+        in the camera.
+        &#34;&#34;&#34;
+        print(&#34;Getting Frame Object..&#34;)
+        ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+        while not(ccd_frame):
+            time.sleep(0.5)
+            ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;got frame object &#34;, ccd_frame)
+        for n in ccd_frame:
+            print(n.name,&#34; = &#34;,n.value)
+        self.subFrameOriginX = ccd_frame[0].value
+        self.subFrameOriginY = ccd_frame[1].value
+        self.subFrameSizeX = ccd_frame[2].value
+        self.subFrameSizeY = ccd_frame[3].value
+        print(&#34;getSubFrame complete&#34;)
+
+    def setSubFrame(self):
+        &#34;&#34;&#34; sets the camera frame dimensions based on the properties
+        of this object.
+        &#34;&#34;&#34;
+        print(&#34;Getting Frame Object..&#34;)
+        ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+        while not(ccd_frame):
+            time.sleep(0.5)
+            ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+            sys.stderr.write(&#34;.&#34;)
+        print(&#34;got frame object &#34;, ccd_frame)
+        for n in ccd_frame:
+            print(n.name,&#34; = &#34;,n.value)
+        ccd_frame[0].value = self.subFrameOriginX
+        ccd_frame[1].value = self.subFrameOriginY
+        ccd_frame[2].value = self.subFrameSizeX
+        ccd_frame[3].value = self.subFrameSizeY
+        self.indiclient.sendNewNumber(ccd_frame)
+        print(&#34;setFrame complete&#34;)
+
+        
+    def startExposure(self):
+        &#34;&#34;&#34; Request the camera to start an exposure &#34;&#34;&#34;
+        print(&#34;startExposure()&#34;)
+        if not self.indiConnected:
+            self.connectINDI()
+
+        print(&#34;Getting Blob&#34;)
+        self.ccd_ccd1=self.device_ccd.getBLOB(&#34;CCD1&#34;)
+        while not(self.ccd_ccd1):
+            time.sleep(0.5)
+            self.ccd_ccd1=self.device_ccd.getBLOB(&#34;CCD1&#34;)
+            sys.stderr.write(&#34;.&#34;)
+
+        print(&#34;got Blob&#34;)
+
+        #self.indiclient.blobEvent.clear()
+        # global blobEvent
+        # blobEvent=threading.Event()
+        # blobEvent.clear()
+        
+        print(&#34;Sending exposure object...&#34;)
+        self.status = self.STATUS_EXPOSING
+        self.ccd_exposure[0].value=self.exposureTime
+        #print(&#34;Setting exposure to %s&#34; % self.ccd_exposure[0])
+        self.indiclient.sendNewNumber(self.ccd_exposure)
+        #print(&#34;waiting for Image Data....&#34;)
+        #blobEvent.wait()
+
+        print(&#34;startExposure Complete&#34;)
+
+
+
+    def receiveImage(self):
+        &#34;&#34;&#34; called by indiClient when Blob received
+        Memory based file handling from https://www.indilib.org/forum/general/606-take-image-with-python-script/3189.html?start=12
+        &#34;&#34;&#34;
+        print(&#34;receiveImage()&#34;)
+        for blob in self.ccd_ccd1:
+            #print(&#34;name: &#34;, blob.name,&#34; size: &#34;, blob.size,&#34; format: &#34;, blob.format)
+            fits=blob.getblobdata()
+            #print(&#34;fits data type: &#34;, type(fits))
+
+        # i=0
+        #fname=&#34;/tmp&#34;
+        #fpath = fname
+        #while os.path.exists(fpath):
+        #    i=i+1
+        #    fname = &#34;image%09d.fits&#34; % i
+        #    fpath = os.path.join(self.dataDir, fname)
+        #ofile = open(fpath, &#34;wb&#34;)
+        #ofile.write(fits)
+        #ofile.close()
+        #print(&#34;written to file %s&#34; % fname)
+
+        blobFile = io.BytesIO(fits)
+        hdulist = astropy.io.fits.open(blobFile)
+        #print(hdulist.info())
+        hdu = hdulist[0]
+        #print(hdu.data.shape)
+        #print(hdu.header)
+        self.curImg = np.asarray(hdu.data,dtype=np.uint16)
+        self.curImageTime = datetime.now().timestamp()
+        self.curImageMean = self.curImg.mean()
+        self.curImageSd = 100 * self.curImg.std() / self.curImageMean
+
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+
+        self.curRoiMean = roiImg.mean()
+        self.curRoiSd = 100 * roiImg.std() / self.curRoiMean
+        self.status = self.STATUS_IDLE
+        print(&#34;curImageTime=%s&#34; % self.curImageTime)
+
+        if (self.autoSave):
+            self.saveImage()
+
+        if (self.continuousMode):
+            self.startExposure()
+        
+
+    def saveImage(self):
+        &#34;&#34;&#34; Save the current image to disk using the base filename
+        fnameRoot.  The image date/time is also appended to the filename
+        with a further index number if necesssary to ensure it is unique.
+        &#34;&#34;&#34;
+        i=0
+        imgDt = datetime.fromtimestamp(self.curImageTime)
+        tsStr = imgDt.strftime(&#34;%Y%m%d%H%M%S&#34;)
+        fname=&#34;%s-%s-%03d.tif&#34; % (self.saveFnameRoot,tsStr,i)
+        fpath = os.path.join(self.dataDir, fname)
+        while os.path.exists(fpath):
+            i=i+1
+            fname=&#34;%s-%s-%03d.tif&#34; % (self.saveFnameRoot,tsStr,i)
+            fpath = os.path.join(self.dataDir, fname)
+        print(&#34;saveImg - Saving to %s.  dataDir=%s&#34; % (fpath,self.dataDir))
+
+        cv2.imwrite(fpath,self.curImg)
+        return(&#34;ok&#34;)
+        
+        
+    def resizeImgForWeb(self,img):
+        &#34;&#34;&#34; Returns a re-sized image for web viewing &#34;&#34;&#34;
+        xMax = int(self.WEB_X_MAX)
+        yMax = int(img.shape[0] * xMax / img.shape[1])
+
+        if (yMax &gt; self.WEB_Y_MAX):
+            yMax = int(self.WEB_Y_MAX)
+            xMax = int(img.shape[1] * yMax / img.shape[0])
+        res = cv2.resize(img, dsize=(xMax,yMax),
+                         interpolation=cv2.INTER_CUBIC)
+        return(res)
+
+    def getWebImage(self):
+        &#34;&#34;&#34; return a copy of the current image, scaled to 800 px width
+        &#34;&#34;&#34;
+        res = self.resizeImgForWeb(self.curImg)
+        success, encImg = cv2.imencode(&#39;.png&#39;,res)
+        imgBytes = encImg.tobytes()
+        return(imgBytes)
+
+    def getRoiWebImage(self):
+        &#34;&#34;&#34; return a copy of the current image, scaled to 800 px width
+        &#34;&#34;&#34;
+        roiImg = cv2.cvtColor(self.curImg,cv2.COLOR_GRAY2RGB)
+        cv2.rectangle(roiImg,
+                      (self.roiOriginX, self.roiOriginY),
+                      (self.roiOriginX + self.roiSizeX,
+                       self.roiOriginY + self.roiSizeY),
+                      (65535,0,0),
+                      3)
+        res = self.resizeImgForWeb(roiImg)
+        success, encImg = cv2.imencode(&#39;.png&#39;,res)
+        imgBytes = encImg.tobytes()
+        return(imgBytes)
+
+    
+    def getFrameHistogram(self):
+        &#34;&#34;&#34; get an image of the histogram of the current image.
+        &#34;&#34;&#34;
+        histData, bins = np.histogram(self.curImg,256)
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(histData)
+        ax.plot(histData)
+        ax.set_title(&#34;Intensity Histogram&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;hist.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+    def getRoiHistogram(self):
+        &#34;&#34;&#34; get an image of the histogram of the current image ROI.
+        &#34;&#34;&#34;
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+        histData, bins = np.histogram(roiImg,256)
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(histData)
+        ax.plot(histData)
+        ax.set_title(&#34;ROI Intensity Histogram&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;hist.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+    
+    def getXProfile(self):
+        &#34;&#34;&#34; get an image of the X profile chart
+        &#34;&#34;&#34;
+        midY = int(self.curImg.shape[0]/2)
+        intProfile = self.curImg[midY,:]
+        xData = np.linspace(0,self.curImg.shape[1]-1,self.curImg.shape[1])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title(&#34;X Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;xProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+    def getRoiXProfile(self):
+        &#34;&#34;&#34; get an image of the ROI X profile chart
+        &#34;&#34;&#34;
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+        midY = int(roiImg.shape[0]/2)
+        intProfile = roiImg[midY,:]
+        xData = np.linspace(0,roiImg.shape[1]-1,roiImg.shape[1])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title(&#34;ROI X Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;roiXProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+    
+    def getYProfile(self):
+        &#34;&#34;&#34; get an image of the Y profile chart
+        &#34;&#34;&#34;
+        midX = int(self.curImg.shape[1]/2)
+        intProfile = self.curImg[:,midX]
+        xData = np.linspace(0,self.curImg.shape[0]-1,self.curImg.shape[0])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title(&#34;Y Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;yProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+
+        return(histImg)
+    
+    def getRoiYProfile(self):
+        &#34;&#34;&#34; get an image of the Y profile chart
+        &#34;&#34;&#34;
+        roiImg = self.curImg[self.roiOriginY :
+                             self.roiOriginY + self.roiSizeY,
+                             self.roiOriginX :
+                             self.roiOriginX + self.roiSizeX]
+        midX = int(roiImg.shape[1]/2)
+        intProfile = roiImg[:,midX]
+        xData = np.linspace(0,roiImg.shape[0]-1,roiImg.shape[0])
+        fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+        #print(xData,intProfile)
+        ax.plot(xData,intProfile)
+        ax.set_title(&#34;ROI Y Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;roiYProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+
+        return(histImg)
+    
+        
+    def onWwwCmd(self,cmdStr,valStr, methodStr,request):
+        &#39;&#39;&#39; Process the command, with parameter &#39;valStr&#39; using request
+        method methodStr, and return the appropriate response.
+        request is the bottlepy request associated with the command.
+        The following commands are recognised:
+        HTTP GET Commands:
+        /getData - returns a JSON string summarising the current state.
+        /getImage - returns a web-scaled version of the latest camera image.
+        /getRoiImage - as for /getImage but the defined ROI is highlighted on the image.
+        /getFullImage - NOT IMPLEMENTED
+        /getFrameHistogram - returns an image of the pixel intensity histogram for the current image.
+        /getRoiHistogram - returns an image of the pixel intensity histogram for the Region of Interest in the current image.
+        /getXProfile - returns an image of a graph showing the intensity of pixels across the X direction at the midpoint of the image in Y.
+        /getRoiXProfile - returns an image of a graph showing the intensity of pixels across the X direction of the region of interest at the midpoint of the image in Y.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction at the midpoint of the image in X.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction of the region of interest at the midpoint of the image in X.
+
+        HTTP POST Commands:
+        /startExposure - start a single camera exposure
+        /startContinuousExposures - start collecting repeated camera exposures.
+        /stopContinuousExposures - stop collecting repeated exposures when the current one completes.
+        /saveImage/&lt;fname&gt; - save the current image with the specified filename root.
+        /startAutoSave/&lt;fname&gt; - start auto saving every image that is received with the specified filename root.
+        /stopAutoSave - stop auto saving images.
+        /setExposureTime/&lt;time_secs&gt; - set the camera exposure time to the given time in seconds.
+        /setCooler/&lt;setpoint&gt; - set the cooler setpoint to the given value (in degC)
+        /setSubFrame/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the subframe in camera pixel coordinates.
+        /setRoi/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the ROI in camera pixel coordinates, relative to subFrame origin.
+        /clearRoi - resets the ROI back to the whole subframe.
+
+        &#39;&#39;&#39;
+        print(&#34;CcdCapture.onWwwCmd(%s/%s %s)&#34; % (cmdStr,valStr,methodStr))
+
+        if (methodStr==&#34;GET&#34;):
+            if (cmdStr.lower()==&#34;getData&#34;.lower()):
+                return self.toJson()
+            elif (cmdStr.lower()==&#34;getImage&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getImage(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    # response.set_header(&#39;Content-type&#39;, &#39;image/png&#39;)
+                    img = self.getWebImage()
+                    #print(&#34;getImage: img=&#34;,img)
+                    return(img)
+            elif (cmdStr.lower()==&#34;getRoiImage&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getRoiImage(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    # response.set_header(&#39;Content-type&#39;, &#39;image/png&#39;)
+                    img = self.getRoiWebImage()
+                    #print(&#34;getRoi Image: img=&#34;,img)
+                    return(img)
+            elif (cmdStr.lower()==&#34;getFullImage&#34;.lower()):
+                print(&#34;FIXME - Implement getFullImage&#34;)
+            elif (cmdStr.lower()==&#34;getFrameHistogram&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getFrameHistogram(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getFrameHistogram()
+                    return(img)
+            elif (cmdStr.lower()==&#34;getXProfile&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getXProfile(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getXProfile()
+                    return(img)
+            elif (cmdStr.lower()==&#34;getYProfile&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getYProfile(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getYProfile()
+                    return(img)
+
+            elif (cmdStr.lower()==&#34;getRoiHistogram&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getRoiHistogram(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getRoiHistogram()
+                    return(img)
+            elif (cmdStr.lower()==&#34;getRoiXProfile&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getRoiXProfile(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getRoiXProfile()
+                    return(img)
+            elif (cmdStr.lower()==&#34;getRoiYProfile&#34;.lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print(&#34;getRoiYProfile(): no image yet!&#34;)
+                    return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+                else:
+                    img = self.getRoiYProfile()
+                    return(img)
+
+
+            else:
+                print(&#34;ERROR - Unreconised Command %s&#34; % cmdStr)
+                return(&#34;&lt;h1&gt;ERROR - Unreconised Command %s&lt;/h1&gt;&#34; % cmdStr)
+        elif (methodStr==&#34;POST&#34;):
+            if (cmdStr.lower()==&#34;startExposure&#34;.lower()):
+                print(&#34;FIXME - Implement startExposure&#34;)
+                self.startExposure()
+                pass
+            elif (cmdStr.lower()==&#34;startContinuousExposures&#34;.lower()):
+                self.continuousMode = True
+                self.startExposure()
+                pass
+            elif (cmdStr.lower()==&#34;stopContinuousExposures&#34;.lower()):
+                self.continuousMode = False
+                pass
+            elif (cmdStr.lower()==&#34;saveImage&#34;.lower()):
+                self.saveFnameRoot = valStr
+                self.saveImage()
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;startAutoSave&#34;.lower()):
+                self.saveFnameRoot = valStr
+                self.autoSave = True
+                self.saveImage()
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;stopAutoSave&#34;.lower()):
+                self.autoSave = False
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;setExposureTime&#34;.lower()):
+                self.exposureTime = float(valStr)
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;setCooler&#34;.lower()):
+                self.coolerSetpoint = float(valStr)
+                self.coolerOn = True
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;setSubFrame&#34;.lower()):
+                origin, size =  valStr.split(&#34;:&#34;)
+                print(origin,size)
+                self.subFrameOriginX = int(origin.split(&#34;,&#34;)[0])
+                self.subFrameOriginY = int(origin.split(&#34;,&#34;)[1])
+                self.subFrameSizeX   = int(size.split(&#34;,&#34;)[0])
+                self.subFrameSizeY   = int(size.split(&#34;,&#34;)[1])
+                self.setSubFrame()
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;setRoi&#34;.lower()):
+                origin, size =  valStr.split(&#34;:&#34;)
+                print(origin,size)
+                self.roiOriginX = int(origin.split(&#34;,&#34;)[0])
+                self.roiOriginY = int(origin.split(&#34;,&#34;)[1])
+                self.roiSizeX   = int(size.split(&#34;,&#34;)[0])
+                self.roiSizeY   = int(size.split(&#34;,&#34;)[1])
+
+                if (self.roiOriginX + self.roiSizeX &gt; self.subFrameSizeX):
+                    self.roiSizeX = self.subFrameSizeX - self.roiOriginX
+                    print(&#34;Clipped ROI to fit in subFrame - X&#34;)
+                if (self.roiOriginY + self.roiSizeY &gt; self.subFrameSizeY):
+                    self.roiSizeY = self.subFrameSizeY - self.roiOriginY
+                    print(&#34;Clipped ROI to fit in subFrame - Y&#34;)
+                return(&#34;ok&#34;)
+            elif (cmdStr.lower()==&#34;clearRoi&#34;.lower()):
+                self.roiOriginX = self.subFrameOriginX
+                self.roiOriginY = self.subFrameOriginY
+                self.roiSizeX   = self.subFrameSizeX
+                self.roiSizeY   = self.subFrameSizeY
+            else:                
+                print(&#34;ERROR - Unreconised Command %s&#34; % cmdStr)
+                return(&#34;&lt;h1&gt;ERROR - Unreconised Command %s&lt;/h1&gt;&#34; % cmdStr)
+        else:
+            print(&#34;ccd_capture.onWwwCmd - Unsupported Method type, %s.&#34; % methodStr)
+            return(&#39;ERROR - Unsupported Method Type %s&#39; % methodStr)
+        
+        return(&#39;&lt;h1&gt;ccd_capture.onWwwCmd - FIXME&lt;/h1&gt;&#39;
+               &#39;We should not see this message!!!&#39;
+               &#39;&lt;br/&gt;cmdStr=%s/%s, method=%s&#39; % (cmdStr,valStr,methodStr))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="WebControlClass.WebControlClass" href="WebControlClass.html#WebControlClass.WebControlClass">WebControlClass</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="ccd_capture.Ccd_capture.STATUS_DOWNLOADING"><code class="name">var <span class="ident">STATUS_DOWNLOADING</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.STATUS_ERROR"><code class="name">var <span class="ident">STATUS_ERROR</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.STATUS_EXPOSING"><code class="name">var <span class="ident">STATUS_EXPOSING</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.STATUS_IDLE"><code class="name">var <span class="ident">STATUS_IDLE</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.STATUS_NO_IMAGE"><code class="name">var <span class="ident">STATUS_NO_IMAGE</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.WEB_X_MAX"><code class="name">var <span class="ident">WEB_X_MAX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.WEB_Y_MAX"><code class="name">var <span class="ident">WEB_Y_MAX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.autoSave"><code class="name">var <span class="ident">autoSave</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.cameraInitialised"><code class="name">var <span class="ident">cameraInitialised</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.continuousMode"><code class="name">var <span class="ident">continuousMode</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.coolerOn"><code class="name">var <span class="ident">coolerOn</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.coolerSetpoint"><code class="name">var <span class="ident">coolerSetpoint</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.curImageMean"><code class="name">var <span class="ident">curImageMean</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.curImageSd"><code class="name">var <span class="ident">curImageSd</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.curImageTime"><code class="name">var <span class="ident">curImageTime</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.curRoiMean"><code class="name">var <span class="ident">curRoiMean</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.curRoiSd"><code class="name">var <span class="ident">curRoiSd</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.errorState"><code class="name">var <span class="ident">errorState</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.exposureTime"><code class="name">var <span class="ident">exposureTime</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.frameSizeX"><code class="name">var <span class="ident">frameSizeX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.frameSizeY"><code class="name">var <span class="ident">frameSizeY</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.indiConnected"><code class="name">var <span class="ident">indiConnected</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.msg"><code class="name">var <span class="ident">msg</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.roiOriginX"><code class="name">var <span class="ident">roiOriginX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.roiOriginY"><code class="name">var <span class="ident">roiOriginY</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.roiSizeX"><code class="name">var <span class="ident">roiSizeX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.roiSizeY"><code class="name">var <span class="ident">roiSizeY</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.saveFnameRoot"><code class="name">var <span class="ident">saveFnameRoot</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.status"><code class="name">var <span class="ident">status</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.subFrameOriginX"><code class="name">var <span class="ident">subFrameOriginX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.subFrameOriginY"><code class="name">var <span class="ident">subFrameOriginY</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.subFrameSizeX"><code class="name">var <span class="ident">subFrameSizeX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="ccd_capture.Ccd_capture.subFrameSizeY"><code class="name">var <span class="ident">subFrameSizeY</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="ccd_capture.Ccd_capture.connectINDI"><code class="name flex">
+<span>def <span class="ident">connectINDI</span></span>(<span>self, cameraId='Atik 383L')</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def connectINDI(self, cameraId=&#34;Atik 383L&#34;):
+    self.indiclient=IndiClient(self.receiveImage)
+    self.indiclient.setServer(&#34;localhost&#34;,7624)
+
+    if (not(self.indiclient.connectServer())):
+        self.msg = &#34;No indiserver running on &#34;+ \
+               self.indiclient.getHost()+&#34;:&#34;+ \
+               str(self.indiclient.getPort())+ \
+               &#34; - Try to run indiserver -vv indi_atik_ccd&#34; 
+        print(self.msg)
+        self.errorState = -2
+        return
+    else:
+        print(&#34;Server Connected OK&#34;)
+
+    if (cameraId == &#34;CCD Simulator&#34;):
+        print(&#34;Using CCD Simulator, so enabling telescope simulator too&#34;)
+        self.initialiseTelescopeSimulator()
+        
+    print(&#34;Looking for device %s....&#34; % cameraId)
+    self.device_ccd=self.indiclient.getDevice(cameraId)
+    print(&#34;returned from getDevice&#34;)
+    while not(self.device_ccd):
+        time.sleep(0.5)
+        self.device_ccd=self.indiclient.getDevice(cameraId)
+        sys.stderr.write(&#34;.&#34;)
+    print(&#34;\nFound device!&#34;)
+
+    print(&#34;Connecting to Device&#34;)
+    self.ccd_connect=self.device_ccd.getSwitch(&#34;CONNECTION&#34;)
+    while not(self.ccd_connect):
+        time.sleep(0.5)
+        self.ccd_connect=self.device_ccd.getSwitch(&#34;CONNECTION&#34;)
+        sys.stderr.write(&#34;.&#34;)
+    print(&#34;\nConnected!&#34;)
+    if not(self.device_ccd.isConnected()):
+        print(&#34;oh no - isConnected is false - fiddling...&#34;)
+        self.ccd_connect[0].s=PyIndi.ISS_ON  # the &#34;CONNECT&#34; switch
+        self.ccd_connect[1].s=PyIndi.ISS_OFF # the &#34;DISCONNECT&#34; switch
+        self.indiclient.sendNewSwitch(self.ccd_connect)
+
+    print(&#34;Getting Exposure Object..&#34;)
+    self.ccd_exposure=self.device_ccd.getNumber(&#34;CCD_EXPOSURE&#34;)
+    while not(self.ccd_exposure):
+        time.sleep(0.5)
+        self.ccd_exposure=self.device_ccd.getNumber(&#34;CCD_EXPOSURE&#34;)
+        sys.stderr.write(&#34;.&#34;)
+    print(&#34;got exposure object &#34;, self.ccd_exposure)
+
+    self.getFrame()
+    self.getSubFrame()
+    
+    # we should inform the indi server that we want to receive the
+    # &#34;CCD1&#34; blob from this device
+    print(&#34;Setting BLOB Mode&#34;)
+    self.indiclient.setBLOBMode(PyIndi.B_ALSO, cameraId, &#34;CCD1&#34;)
+
+    self.indiConnected = True;
+
+    self.msg = &#34;ConnectINDI Complete&#34;
+    self.errorState = 0
+    print(self.msg)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getFrame"><code class="name flex">
+<span>def <span class="ident">getFrame</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Populates this object with the current frame dimensions
+in the camera.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getFrame(self):
+    &#34;&#34;&#34; Populates this object with the current frame dimensions
+    in the camera.
+    &#34;&#34;&#34;
+    print(&#34;Getting CCD_INFO Object..&#34;)
+    ccd_info=self.device_ccd.getNumber(&#34;CCD_INFO&#34;)
+    while not(ccd_info):
+        time.sleep(0.5)
+        ccd_info=self.device_ccd.getNumber(&#34;CCD_INFO&#34;)
+        sys.stderr.write(&#34;.&#34;)
+    print(&#34;got ccd_info object &#34;, ccd_info)
+    for n in ccd_info:
+        print(n.name,&#34; = &#34;,n.value)
+    self.frameSizeX = ccd_info[0].value
+    self.frameSizeY = ccd_info[1].value
+    print(&#34;getFrame Complete&#34;)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getFrameHistogram"><code class="name flex">
+<span>def <span class="ident">getFrameHistogram</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>get an image of the histogram of the current image.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getFrameHistogram(self):
+    &#34;&#34;&#34; get an image of the histogram of the current image.
+    &#34;&#34;&#34;
+    histData, bins = np.histogram(self.curImg,256)
+    fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+    #print(histData)
+    ax.plot(histData)
+    ax.set_title(&#34;Intensity Histogram&#34;)
+    histImg = io.BytesIO()
+    fig.savefig(histImg, format=&#39;png&#39;)
+    histImg.seek(0)
+    fig.savefig(&#39;hist.png&#39;)   # save the figure to file
+    plt.close(fig)    # close the figure
+    return(histImg)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getRoiHistogram"><code class="name flex">
+<span>def <span class="ident">getRoiHistogram</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>get an image of the histogram of the current image ROI.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getRoiHistogram(self):
+    &#34;&#34;&#34; get an image of the histogram of the current image ROI.
+    &#34;&#34;&#34;
+    roiImg = self.curImg[self.roiOriginY :
+                         self.roiOriginY + self.roiSizeY,
+                         self.roiOriginX :
+                         self.roiOriginX + self.roiSizeX]
+    histData, bins = np.histogram(roiImg,256)
+    fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+    #print(histData)
+    ax.plot(histData)
+    ax.set_title(&#34;ROI Intensity Histogram&#34;)
+    histImg = io.BytesIO()
+    fig.savefig(histImg, format=&#39;png&#39;)
+    histImg.seek(0)
+    fig.savefig(&#39;hist.png&#39;)   # save the figure to file
+    plt.close(fig)    # close the figure
+    return(histImg)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getRoiWebImage"><code class="name flex">
+<span>def <span class="ident">getRoiWebImage</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>return a copy of the current image, scaled to 800 px width</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getRoiWebImage(self):
+    &#34;&#34;&#34; return a copy of the current image, scaled to 800 px width
+    &#34;&#34;&#34;
+    roiImg = cv2.cvtColor(self.curImg,cv2.COLOR_GRAY2RGB)
+    cv2.rectangle(roiImg,
+                  (self.roiOriginX, self.roiOriginY),
+                  (self.roiOriginX + self.roiSizeX,
+                   self.roiOriginY + self.roiSizeY),
+                  (65535,0,0),
+                  3)
+    res = self.resizeImgForWeb(roiImg)
+    success, encImg = cv2.imencode(&#39;.png&#39;,res)
+    imgBytes = encImg.tobytes()
+    return(imgBytes)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getRoiXProfile"><code class="name flex">
+<span>def <span class="ident">getRoiXProfile</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>get an image of the ROI X profile chart</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getRoiXProfile(self):
+    &#34;&#34;&#34; get an image of the ROI X profile chart
+    &#34;&#34;&#34;
+    roiImg = self.curImg[self.roiOriginY :
+                         self.roiOriginY + self.roiSizeY,
+                         self.roiOriginX :
+                         self.roiOriginX + self.roiSizeX]
+    midY = int(roiImg.shape[0]/2)
+    intProfile = roiImg[midY,:]
+    xData = np.linspace(0,roiImg.shape[1]-1,roiImg.shape[1])
+    fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+    #print(xData,intProfile)
+    ax.plot(xData,intProfile)
+    ax.set_title(&#34;ROI X Intensity Profile&#34;)
+    histImg = io.BytesIO()
+    fig.savefig(histImg, format=&#39;png&#39;)
+    histImg.seek(0)
+    fig.savefig(&#39;roiXProfile.png&#39;)   # save the figure to file
+    plt.close(fig)    # close the figure
+    return(histImg)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getRoiYProfile"><code class="name flex">
+<span>def <span class="ident">getRoiYProfile</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>get an image of the Y profile chart</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getRoiYProfile(self):
+    &#34;&#34;&#34; get an image of the Y profile chart
+    &#34;&#34;&#34;
+    roiImg = self.curImg[self.roiOriginY :
+                         self.roiOriginY + self.roiSizeY,
+                         self.roiOriginX :
+                         self.roiOriginX + self.roiSizeX]
+    midX = int(roiImg.shape[1]/2)
+    intProfile = roiImg[:,midX]
+    xData = np.linspace(0,roiImg.shape[0]-1,roiImg.shape[0])
+    fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+    #print(xData,intProfile)
+    ax.plot(xData,intProfile)
+    ax.set_title(&#34;ROI Y Intensity Profile&#34;)
+    histImg = io.BytesIO()
+    fig.savefig(histImg, format=&#39;png&#39;)
+    histImg.seek(0)
+    fig.savefig(&#39;roiYProfile.png&#39;)   # save the figure to file
+    plt.close(fig)    # close the figure
+
+    return(histImg)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getSubFrame"><code class="name flex">
+<span>def <span class="ident">getSubFrame</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Populates this object with the current subframe dimensions
+in the camera.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getSubFrame(self):
+    &#34;&#34;&#34; Populates this object with the current subframe dimensions
+    in the camera.
+    &#34;&#34;&#34;
+    print(&#34;Getting Frame Object..&#34;)
+    ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+    while not(ccd_frame):
+        time.sleep(0.5)
+        ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+        sys.stderr.write(&#34;.&#34;)
+    print(&#34;got frame object &#34;, ccd_frame)
+    for n in ccd_frame:
+        print(n.name,&#34; = &#34;,n.value)
+    self.subFrameOriginX = ccd_frame[0].value
+    self.subFrameOriginY = ccd_frame[1].value
+    self.subFrameSizeX = ccd_frame[2].value
+    self.subFrameSizeY = ccd_frame[3].value
+    print(&#34;getSubFrame complete&#34;)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getWebImage"><code class="name flex">
+<span>def <span class="ident">getWebImage</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>return a copy of the current image, scaled to 800 px width</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getWebImage(self):
+    &#34;&#34;&#34; return a copy of the current image, scaled to 800 px width
+    &#34;&#34;&#34;
+    res = self.resizeImgForWeb(self.curImg)
+    success, encImg = cv2.imencode(&#39;.png&#39;,res)
+    imgBytes = encImg.tobytes()
+    return(imgBytes)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getXProfile"><code class="name flex">
+<span>def <span class="ident">getXProfile</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>get an image of the X profile chart</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getXProfile(self):
+    &#34;&#34;&#34; get an image of the X profile chart
+    &#34;&#34;&#34;
+    midY = int(self.curImg.shape[0]/2)
+    intProfile = self.curImg[midY,:]
+    xData = np.linspace(0,self.curImg.shape[1]-1,self.curImg.shape[1])
+    fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+    #print(xData,intProfile)
+    ax.plot(xData,intProfile)
+    ax.set_title(&#34;X Intensity Profile&#34;)
+    histImg = io.BytesIO()
+    fig.savefig(histImg, format=&#39;png&#39;)
+    histImg.seek(0)
+    fig.savefig(&#39;xProfile.png&#39;)   # save the figure to file
+    plt.close(fig)    # close the figure
+    return(histImg)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.getYProfile"><code class="name flex">
+<span>def <span class="ident">getYProfile</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>get an image of the Y profile chart</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getYProfile(self):
+    &#34;&#34;&#34; get an image of the Y profile chart
+    &#34;&#34;&#34;
+    midX = int(self.curImg.shape[1]/2)
+    intProfile = self.curImg[:,midX]
+    xData = np.linspace(0,self.curImg.shape[0]-1,self.curImg.shape[0])
+    fig, ax = plt.subplots( nrows=1, ncols=1 )  # create figure &amp; 1 axis
+    #print(xData,intProfile)
+    ax.plot(xData,intProfile)
+    ax.set_title(&#34;Y Intensity Profile&#34;)
+    histImg = io.BytesIO()
+    fig.savefig(histImg, format=&#39;png&#39;)
+    histImg.seek(0)
+    fig.savefig(&#39;yProfile.png&#39;)   # save the figure to file
+    plt.close(fig)    # close the figure
+
+    return(histImg)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.initialiseCamera"><code class="name flex">
+<span>def <span class="ident">initialiseCamera</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Query the INDI Server to get the current camera settings.
+Sets the sub frame to be the full frame.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def initialiseCamera(self):
+    &#34;&#34;&#34; Query the INDI Server to get the current camera settings.
+    Sets the sub frame to be the full frame.
+    &#34;&#34;&#34;
+    pass</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.initialiseTelescopeSimulator"><code class="name flex">
+<span>def <span class="ident">initialiseTelescopeSimulator</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def initialiseTelescopeSimulator(self):
+    # connect the scope
+    telescope=&#34;Telescope Simulator&#34;
+    device_telescope=None
+    telescope_connect=None
+
+    # get the telescope device
+    device_telescope=self.indiclient.getDevice(telescope)
+    while not(device_telescope):
+        time.sleep(0.5)
+        device_telescope=self.indiclient.getDevice(telescope)
+        
+    # wait CONNECTION property be defined for telescope
+    telescope_connect=device_telescope.getSwitch(&#34;CONNECTION&#34;)
+    while not(telescope_connect):
+        time.sleep(0.5)
+        telescope_connect=device_telescope.getSwitch(&#34;CONNECTION&#34;)
+
+    # if the telescope device is not connected, we do connect it
+    if not(device_telescope.isConnected()):
+        # Property vectors are mapped to iterable Python objects
+        # Hence we can access each element of the vector using Python indexing
+        # each element of the &#34;CONNECTION&#34; vector is a ISwitch
+        telescope_connect[0].s=PyIndi.ISS_ON  # the &#34;CONNECT&#34; switch
+        telescope_connect[1].s=PyIndi.ISS_OFF # the &#34;DISCONNECT&#34; switch
+        self.indiclient.sendNewSwitch(telescope_connect) # send this new value to the device
+            
+    # Now let&#39;s make a goto to vega
+    # Beware that ra/dec are in decimal hours/degrees
+    vega={&#39;ra&#39;: (279.23473479 * 24.0)/360.0, &#39;dec&#39;: +38.78368896 }
+
+    # We want to set the ON_COORD_SET switch to engage tracking after goto
+    # device.getSwitch is a helper to retrieve a property vector
+    telescope_on_coord_set=device_telescope.getSwitch(&#34;ON_COORD_SET&#34;)
+    while not(telescope_on_coord_set):
+        time.sleep(0.5)
+        telescope_on_coord_set=device_telescope.getSwitch(&#34;ON_COORD_SET&#34;)
+    # the order below is defined in the property vector, look at the standard Properties page
+    # or enumerate them in the Python shell when you&#39;re developing your program
+    telescope_on_coord_set[0].s=PyIndi.ISS_ON  # TRACK
+    telescope_on_coord_set[1].s=PyIndi.ISS_OFF # SLEW
+    telescope_on_coord_set[2].s=PyIndi.ISS_OFF # SYNC
+    self.indiclient.sendNewSwitch(telescope_on_coord_set)
+    # We set the desired coordinates
+    telescope_radec=device_telescope.getNumber(&#34;EQUATORIAL_EOD_COORD&#34;)
+    while not(telescope_radec):
+        time.sleep(0.5)
+        telescope_radec=device_telescope.getNumber(&#34;EQUATORIAL_EOD_COORD&#34;)
+    telescope_radec[0].value=vega[&#39;ra&#39;]
+    telescope_radec[1].value=vega[&#39;dec&#39;]
+    self.indiclient.sendNewNumber(telescope_radec)
+    # and wait for the scope has finished moving
+    while (telescope_radec.s==PyIndi.IPS_BUSY):
+        print(&#34;Scope Moving &#34;, telescope_radec[0].value, telescope_radec[1].value)
+        time.sleep(2)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.onWwwCmd"><code class="name flex">
+<span>def <span class="ident">onWwwCmd</span></span>(<span>self, cmdStr, valStr, methodStr, request)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Process the command, with parameter 'valStr' using request
+method methodStr, and return the appropriate response.
+request is the bottlepy request associated with the command.
+The following commands are recognised:
+HTTP GET Commands:
+/getData - returns a JSON string summarising the current state.
+/getImage - returns a web-scaled version of the latest camera image.
+/getRoiImage - as for /getImage but the defined ROI is highlighted on the image.
+/getFullImage - NOT IMPLEMENTED
+/getFrameHistogram - returns an image of the pixel intensity histogram for the current image.
+/getRoiHistogram - returns an image of the pixel intensity histogram for the Region of Interest in the current image.
+/getXProfile - returns an image of a graph showing the intensity of pixels across the X direction at the midpoint of the image in Y.
+/getRoiXProfile - returns an image of a graph showing the intensity of pixels across the X direction of the region of interest at the midpoint of the image in Y.
+/getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction at the midpoint of the image in X.
+/getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction of the region of interest at the midpoint of the image in X.</p>
+<p>HTTP POST Commands:
+/startExposure - start a single camera exposure
+/startContinuousExposures - start collecting repeated camera exposures.
+/stopContinuousExposures - stop collecting repeated exposures when the current one completes.
+/saveImage/<fname> - save the current image with the specified filename root.
+/startAutoSave/<fname> - start auto saving every image that is received with the specified filename root.
+/stopAutoSave - stop auto saving images.
+/setExposureTime/<time_secs> - set the camera exposure time to the given time in seconds.
+/setCooler/<setpoint> - set the cooler setpoint to the given value (in degC)
+/setSubFrame/<OriginX>,<OriginY>:<SizeX>,<SizeY> define the subframe in camera pixel coordinates.
+/setRoi/<OriginX>,<OriginY>:<SizeX>,<SizeY> define the ROI in camera pixel coordinates, relative to subFrame origin.
+/clearRoi - resets the ROI back to the whole subframe.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def onWwwCmd(self,cmdStr,valStr, methodStr,request):
+    &#39;&#39;&#39; Process the command, with parameter &#39;valStr&#39; using request
+    method methodStr, and return the appropriate response.
+    request is the bottlepy request associated with the command.
+    The following commands are recognised:
+    HTTP GET Commands:
+    /getData - returns a JSON string summarising the current state.
+    /getImage - returns a web-scaled version of the latest camera image.
+    /getRoiImage - as for /getImage but the defined ROI is highlighted on the image.
+    /getFullImage - NOT IMPLEMENTED
+    /getFrameHistogram - returns an image of the pixel intensity histogram for the current image.
+    /getRoiHistogram - returns an image of the pixel intensity histogram for the Region of Interest in the current image.
+    /getXProfile - returns an image of a graph showing the intensity of pixels across the X direction at the midpoint of the image in Y.
+    /getRoiXProfile - returns an image of a graph showing the intensity of pixels across the X direction of the region of interest at the midpoint of the image in Y.
+    /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction at the midpoint of the image in X.
+    /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction of the region of interest at the midpoint of the image in X.
+
+    HTTP POST Commands:
+    /startExposure - start a single camera exposure
+    /startContinuousExposures - start collecting repeated camera exposures.
+    /stopContinuousExposures - stop collecting repeated exposures when the current one completes.
+    /saveImage/&lt;fname&gt; - save the current image with the specified filename root.
+    /startAutoSave/&lt;fname&gt; - start auto saving every image that is received with the specified filename root.
+    /stopAutoSave - stop auto saving images.
+    /setExposureTime/&lt;time_secs&gt; - set the camera exposure time to the given time in seconds.
+    /setCooler/&lt;setpoint&gt; - set the cooler setpoint to the given value (in degC)
+    /setSubFrame/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the subframe in camera pixel coordinates.
+    /setRoi/&lt;OriginX&gt;,&lt;OriginY&gt;:&lt;SizeX&gt;,&lt;SizeY&gt; define the ROI in camera pixel coordinates, relative to subFrame origin.
+    /clearRoi - resets the ROI back to the whole subframe.
+
+    &#39;&#39;&#39;
+    print(&#34;CcdCapture.onWwwCmd(%s/%s %s)&#34; % (cmdStr,valStr,methodStr))
+
+    if (methodStr==&#34;GET&#34;):
+        if (cmdStr.lower()==&#34;getData&#34;.lower()):
+            return self.toJson()
+        elif (cmdStr.lower()==&#34;getImage&#34;.lower()):
+            if (self.status == self.STATUS_NO_IMAGE):
+                print(&#34;getImage(): no image yet!&#34;)
+                return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+            else:
+                # response.set_header(&#39;Content-type&#39;, &#39;image/png&#39;)
+                img = self.getWebImage()
+                #print(&#34;getImage: img=&#34;,img)
+                return(img)
+        elif (cmdStr.lower()==&#34;getRoiImage&#34;.lower()):
+            if (self.status == self.STATUS_NO_IMAGE):
+                print(&#34;getRoiImage(): no image yet!&#34;)
+                return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+            else:
+                # response.set_header(&#39;Content-type&#39;, &#39;image/png&#39;)
+                img = self.getRoiWebImage()
+                #print(&#34;getRoi Image: img=&#34;,img)
+                return(img)
+        elif (cmdStr.lower()==&#34;getFullImage&#34;.lower()):
+            print(&#34;FIXME - Implement getFullImage&#34;)
+        elif (cmdStr.lower()==&#34;getFrameHistogram&#34;.lower()):
+            if (self.status == self.STATUS_NO_IMAGE):
+                print(&#34;getFrameHistogram(): no image yet!&#34;)
+                return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+            else:
+                img = self.getFrameHistogram()
+                return(img)
+        elif (cmdStr.lower()==&#34;getXProfile&#34;.lower()):
+            if (self.status == self.STATUS_NO_IMAGE):
+                print(&#34;getXProfile(): no image yet!&#34;)
+                return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+            else:
+                img = self.getXProfile()
+                return(img)
+        elif (cmdStr.lower()==&#34;getYProfile&#34;.lower()):
+            if (self.status == self.STATUS_NO_IMAGE):
+                print(&#34;getYProfile(): no image yet!&#34;)
+                return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+            else:
+                img = self.getYProfile()
+                return(img)
+
+        elif (cmdStr.lower()==&#34;getRoiHistogram&#34;.lower()):
+            if (self.status == self.STATUS_NO_IMAGE):
+                print(&#34;getRoiHistogram(): no image yet!&#34;)
+                return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+            else:
+                img = self.getRoiHistogram()
+                return(img)
+        elif (cmdStr.lower()==&#34;getRoiXProfile&#34;.lower()):
+            if (self.status == self.STATUS_NO_IMAGE):
+                print(&#34;getRoiXProfile(): no image yet!&#34;)
+                return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+            else:
+                img = self.getRoiXProfile()
+                return(img)
+        elif (cmdStr.lower()==&#34;getRoiYProfile&#34;.lower()):
+            if (self.status == self.STATUS_NO_IMAGE):
+                print(&#34;getRoiYProfile(): no image yet!&#34;)
+                return(&#34;&lt;p&gt;No Image&lt;/p&gt;&#34;)
+            else:
+                img = self.getRoiYProfile()
+                return(img)
+
+
+        else:
+            print(&#34;ERROR - Unreconised Command %s&#34; % cmdStr)
+            return(&#34;&lt;h1&gt;ERROR - Unreconised Command %s&lt;/h1&gt;&#34; % cmdStr)
+    elif (methodStr==&#34;POST&#34;):
+        if (cmdStr.lower()==&#34;startExposure&#34;.lower()):
+            print(&#34;FIXME - Implement startExposure&#34;)
+            self.startExposure()
+            pass
+        elif (cmdStr.lower()==&#34;startContinuousExposures&#34;.lower()):
+            self.continuousMode = True
+            self.startExposure()
+            pass
+        elif (cmdStr.lower()==&#34;stopContinuousExposures&#34;.lower()):
+            self.continuousMode = False
+            pass
+        elif (cmdStr.lower()==&#34;saveImage&#34;.lower()):
+            self.saveFnameRoot = valStr
+            self.saveImage()
+            return(&#34;ok&#34;)
+        elif (cmdStr.lower()==&#34;startAutoSave&#34;.lower()):
+            self.saveFnameRoot = valStr
+            self.autoSave = True
+            self.saveImage()
+            return(&#34;ok&#34;)
+        elif (cmdStr.lower()==&#34;stopAutoSave&#34;.lower()):
+            self.autoSave = False
+            return(&#34;ok&#34;)
+        elif (cmdStr.lower()==&#34;setExposureTime&#34;.lower()):
+            self.exposureTime = float(valStr)
+            return(&#34;ok&#34;)
+        elif (cmdStr.lower()==&#34;setCooler&#34;.lower()):
+            self.coolerSetpoint = float(valStr)
+            self.coolerOn = True
+            return(&#34;ok&#34;)
+        elif (cmdStr.lower()==&#34;setSubFrame&#34;.lower()):
+            origin, size =  valStr.split(&#34;:&#34;)
+            print(origin,size)
+            self.subFrameOriginX = int(origin.split(&#34;,&#34;)[0])
+            self.subFrameOriginY = int(origin.split(&#34;,&#34;)[1])
+            self.subFrameSizeX   = int(size.split(&#34;,&#34;)[0])
+            self.subFrameSizeY   = int(size.split(&#34;,&#34;)[1])
+            self.setSubFrame()
+            return(&#34;ok&#34;)
+        elif (cmdStr.lower()==&#34;setRoi&#34;.lower()):
+            origin, size =  valStr.split(&#34;:&#34;)
+            print(origin,size)
+            self.roiOriginX = int(origin.split(&#34;,&#34;)[0])
+            self.roiOriginY = int(origin.split(&#34;,&#34;)[1])
+            self.roiSizeX   = int(size.split(&#34;,&#34;)[0])
+            self.roiSizeY   = int(size.split(&#34;,&#34;)[1])
+
+            if (self.roiOriginX + self.roiSizeX &gt; self.subFrameSizeX):
+                self.roiSizeX = self.subFrameSizeX - self.roiOriginX
+                print(&#34;Clipped ROI to fit in subFrame - X&#34;)
+            if (self.roiOriginY + self.roiSizeY &gt; self.subFrameSizeY):
+                self.roiSizeY = self.subFrameSizeY - self.roiOriginY
+                print(&#34;Clipped ROI to fit in subFrame - Y&#34;)
+            return(&#34;ok&#34;)
+        elif (cmdStr.lower()==&#34;clearRoi&#34;.lower()):
+            self.roiOriginX = self.subFrameOriginX
+            self.roiOriginY = self.subFrameOriginY
+            self.roiSizeX   = self.subFrameSizeX
+            self.roiSizeY   = self.subFrameSizeY
+        else:                
+            print(&#34;ERROR - Unreconised Command %s&#34; % cmdStr)
+            return(&#34;&lt;h1&gt;ERROR - Unreconised Command %s&lt;/h1&gt;&#34; % cmdStr)
+    else:
+        print(&#34;ccd_capture.onWwwCmd - Unsupported Method type, %s.&#34; % methodStr)
+        return(&#39;ERROR - Unsupported Method Type %s&#39; % methodStr)
+    
+    return(&#39;&lt;h1&gt;ccd_capture.onWwwCmd - FIXME&lt;/h1&gt;&#39;
+           &#39;We should not see this message!!!&#39;
+           &#39;&lt;br/&gt;cmdStr=%s/%s, method=%s&#39; % (cmdStr,valStr,methodStr))</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.receiveImage"><code class="name flex">
+<span>def <span class="ident">receiveImage</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>called by indiClient when Blob received
+Memory based file handling from <a href="https://www.indilib.org/forum/general/606-take-image-with-python-script/3189.html?start=12">https://www.indilib.org/forum/general/606-take-image-with-python-script/3189.html?start=12</a></p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def receiveImage(self):
+    &#34;&#34;&#34; called by indiClient when Blob received
+    Memory based file handling from https://www.indilib.org/forum/general/606-take-image-with-python-script/3189.html?start=12
+    &#34;&#34;&#34;
+    print(&#34;receiveImage()&#34;)
+    for blob in self.ccd_ccd1:
+        #print(&#34;name: &#34;, blob.name,&#34; size: &#34;, blob.size,&#34; format: &#34;, blob.format)
+        fits=blob.getblobdata()
+        #print(&#34;fits data type: &#34;, type(fits))
+
+    # i=0
+    #fname=&#34;/tmp&#34;
+    #fpath = fname
+    #while os.path.exists(fpath):
+    #    i=i+1
+    #    fname = &#34;image%09d.fits&#34; % i
+    #    fpath = os.path.join(self.dataDir, fname)
+    #ofile = open(fpath, &#34;wb&#34;)
+    #ofile.write(fits)
+    #ofile.close()
+    #print(&#34;written to file %s&#34; % fname)
+
+    blobFile = io.BytesIO(fits)
+    hdulist = astropy.io.fits.open(blobFile)
+    #print(hdulist.info())
+    hdu = hdulist[0]
+    #print(hdu.data.shape)
+    #print(hdu.header)
+    self.curImg = np.asarray(hdu.data,dtype=np.uint16)
+    self.curImageTime = datetime.now().timestamp()
+    self.curImageMean = self.curImg.mean()
+    self.curImageSd = 100 * self.curImg.std() / self.curImageMean
+
+    roiImg = self.curImg[self.roiOriginY :
+                         self.roiOriginY + self.roiSizeY,
+                         self.roiOriginX :
+                         self.roiOriginX + self.roiSizeX]
+
+    self.curRoiMean = roiImg.mean()
+    self.curRoiSd = 100 * roiImg.std() / self.curRoiMean
+    self.status = self.STATUS_IDLE
+    print(&#34;curImageTime=%s&#34; % self.curImageTime)
+
+    if (self.autoSave):
+        self.saveImage()
+
+    if (self.continuousMode):
+        self.startExposure()</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.resizeImgForWeb"><code class="name flex">
+<span>def <span class="ident">resizeImgForWeb</span></span>(<span>self, img)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns a re-sized image for web viewing</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def resizeImgForWeb(self,img):
+    &#34;&#34;&#34; Returns a re-sized image for web viewing &#34;&#34;&#34;
+    xMax = int(self.WEB_X_MAX)
+    yMax = int(img.shape[0] * xMax / img.shape[1])
+
+    if (yMax &gt; self.WEB_Y_MAX):
+        yMax = int(self.WEB_Y_MAX)
+        xMax = int(img.shape[1] * yMax / img.shape[0])
+    res = cv2.resize(img, dsize=(xMax,yMax),
+                     interpolation=cv2.INTER_CUBIC)
+    return(res)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.saveImage"><code class="name flex">
+<span>def <span class="ident">saveImage</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Save the current image to disk using the base filename
+fnameRoot.
+The image date/time is also appended to the filename
+with a further index number if necesssary to ensure it is unique.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def saveImage(self):
+    &#34;&#34;&#34; Save the current image to disk using the base filename
+    fnameRoot.  The image date/time is also appended to the filename
+    with a further index number if necesssary to ensure it is unique.
+    &#34;&#34;&#34;
+    i=0
+    imgDt = datetime.fromtimestamp(self.curImageTime)
+    tsStr = imgDt.strftime(&#34;%Y%m%d%H%M%S&#34;)
+    fname=&#34;%s-%s-%03d.tif&#34; % (self.saveFnameRoot,tsStr,i)
+    fpath = os.path.join(self.dataDir, fname)
+    while os.path.exists(fpath):
+        i=i+1
+        fname=&#34;%s-%s-%03d.tif&#34; % (self.saveFnameRoot,tsStr,i)
+        fpath = os.path.join(self.dataDir, fname)
+    print(&#34;saveImg - Saving to %s.  dataDir=%s&#34; % (fpath,self.dataDir))
+
+    cv2.imwrite(fpath,self.curImg)
+    return(&#34;ok&#34;)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.setSubFrame"><code class="name flex">
+<span>def <span class="ident">setSubFrame</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>sets the camera frame dimensions based on the properties
+of this object.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def setSubFrame(self):
+    &#34;&#34;&#34; sets the camera frame dimensions based on the properties
+    of this object.
+    &#34;&#34;&#34;
+    print(&#34;Getting Frame Object..&#34;)
+    ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+    while not(ccd_frame):
+        time.sleep(0.5)
+        ccd_frame=self.device_ccd.getNumber(&#34;CCD_FRAME&#34;)
+        sys.stderr.write(&#34;.&#34;)
+    print(&#34;got frame object &#34;, ccd_frame)
+    for n in ccd_frame:
+        print(n.name,&#34; = &#34;,n.value)
+    ccd_frame[0].value = self.subFrameOriginX
+    ccd_frame[1].value = self.subFrameOriginY
+    ccd_frame[2].value = self.subFrameSizeX
+    ccd_frame[3].value = self.subFrameSizeY
+    self.indiclient.sendNewNumber(ccd_frame)
+    print(&#34;setFrame complete&#34;)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.startExposure"><code class="name flex">
+<span>def <span class="ident">startExposure</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Request the camera to start an exposure</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def startExposure(self):
+    &#34;&#34;&#34; Request the camera to start an exposure &#34;&#34;&#34;
+    print(&#34;startExposure()&#34;)
+    if not self.indiConnected:
+        self.connectINDI()
+
+    print(&#34;Getting Blob&#34;)
+    self.ccd_ccd1=self.device_ccd.getBLOB(&#34;CCD1&#34;)
+    while not(self.ccd_ccd1):
+        time.sleep(0.5)
+        self.ccd_ccd1=self.device_ccd.getBLOB(&#34;CCD1&#34;)
+        sys.stderr.write(&#34;.&#34;)
+
+    print(&#34;got Blob&#34;)
+
+    #self.indiclient.blobEvent.clear()
+    # global blobEvent
+    # blobEvent=threading.Event()
+    # blobEvent.clear()
+    
+    print(&#34;Sending exposure object...&#34;)
+    self.status = self.STATUS_EXPOSING
+    self.ccd_exposure[0].value=self.exposureTime
+    #print(&#34;Setting exposure to %s&#34; % self.ccd_exposure[0])
+    self.indiclient.sendNewNumber(self.ccd_exposure)
+    #print(&#34;waiting for Image Data....&#34;)
+    #blobEvent.wait()
+
+    print(&#34;startExposure Complete&#34;)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.Ccd_capture.toJson"><code class="name flex">
+<span>def <span class="ident">toJson</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def toJson(self):
+    obj = {}
+    obj[&#39;statusVal&#39;]=self.status
+    obj[&#39;errorState&#39;]=self.errorState
+    obj[&#39;msg&#39;]=self.msg
+    obj[&#39;cameraId&#39;]=self.cameraId
+    obj[&#39;exposureTime&#39;]=self.exposureTime
+    obj[&#39;subFrameOriginX&#39;]=self.subFrameOriginX
+    obj[&#39;subFrameOriginY&#39;]=self.subFrameOriginY
+    obj[&#39;subFrameSizeX&#39;]=self.subFrameSizeX
+    obj[&#39;subFrameSizeY&#39;]=self.subFrameSizeY
+    obj[&#39;roiOriginX&#39;]=self.roiOriginX
+    obj[&#39;roiOriginY&#39;]=self.roiOriginY
+    obj[&#39;roiSizeX&#39;]=self.roiSizeX
+    obj[&#39;roiSizeY&#39;]=self.roiSizeY
+    obj[&#39;frameSizeX&#39;]=self.frameSizeX
+    obj[&#39;frameSizeY&#39;]=self.frameSizeY
+    obj[&#39;coolerSetpoint&#39;]=self.coolerSetpoint
+    obj[&#39;coolerOn&#39;]=self.coolerOn
+    obj[&#39;curImageTime&#39;]=self.curImageTime
+    obj[&#39;curImageMean&#39;]=&#34;%.1f&#34; % self.curImageMean
+    obj[&#39;curImageSd&#39;]=&#34;%.1f&#34; % self.curImageSd
+    obj[&#39;curRoiMean&#39;]=&#34;%.1f&#34; % self.curRoiMean
+    obj[&#39;curRoiSd&#39;]=&#34;%.1f&#34; % self.curRoiSd
+
+
+    jsonStr = json.dumps(obj,indent=2,sort_keys=True)
+    #print jsonStr
+    return jsonStr</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="WebControlClass.WebControlClass" href="WebControlClass.html#WebControlClass.WebControlClass">WebControlClass</a></b></code>:
+<ul class="hlist">
+<li><code><a title="WebControlClass.WebControlClass.getDataFromServer" href="WebControlClass.html#WebControlClass.WebControlClass.getDataFromServer">getDataFromServer</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="ccd_capture.IndiClient"><code class="flex name class">
+<span>class <span class="ident">IndiClient</span></span>
+<span>(</span><span>imgCallback=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class IndiClient(PyIndi.BaseClient):
+    def __init__(self,imgCallback = None):
+        super(IndiClient, self).__init__()
+        #self.blobEvent=threading.Event()
+        #self.blobEvent.clear()
+        self.imgCallback = imgCallback
+
+    def newDevice(self, d):
+        print(&#34;newDevice:&#34;,d.getDeviceName())
+
+    def newProperty(self, p):
+        print(&#34;New property &#34;, p.getName(), &#34; for device &#34;,
+              p.getDeviceName())
+        if (p.getName() == &#34;CCD_FRAME&#34;):
+            for n in p.getNumber():
+                print(n.name, &#34; = &#34;, n.value)
+    def removeProperty(self, p):
+        pass
+    def newBLOB(self, bp):
+        #global blobEvent
+        print(&#34;new BLOB &#34;, bp.name)
+        #self.blobEvent.set()
+        #blobEvent.set()
+        self.imgCallback()
+
+    def newSwitch(self, svp):
+        pass
+    def newNumber(self, nvp):
+        pass
+    def newText(self, tvp):
+        print(&#34;IndiClient.newText: &#34;,tvp)
+        pass
+    def newLight(self, lvp):
+        pass
+    def newMessage(self, d, m):
+        print(&#34;IndiClient.newMessage: &#34;,m.real)
+        pass
+    def serverConnected(self):
+        print(&#34;serverConnected&#34;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>PyIndi.BaseClient</li>
+<li>PyIndi.BaseMediator</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="ccd_capture.IndiClient.newBLOB"><code class="name flex">
+<span>def <span class="ident">newBLOB</span></span>(<span>self, bp)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def newBLOB(self, bp):
+    #global blobEvent
+    print(&#34;new BLOB &#34;, bp.name)
+    #self.blobEvent.set()
+    #blobEvent.set()
+    self.imgCallback()</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.IndiClient.newDevice"><code class="name flex">
+<span>def <span class="ident">newDevice</span></span>(<span>self, d)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def newDevice(self, d):
+    print(&#34;newDevice:&#34;,d.getDeviceName())</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.IndiClient.newLight"><code class="name flex">
+<span>def <span class="ident">newLight</span></span>(<span>self, lvp)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def newLight(self, lvp):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.IndiClient.newMessage"><code class="name flex">
+<span>def <span class="ident">newMessage</span></span>(<span>self, d, m)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def newMessage(self, d, m):
+    print(&#34;IndiClient.newMessage: &#34;,m.real)
+    pass</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.IndiClient.newNumber"><code class="name flex">
+<span>def <span class="ident">newNumber</span></span>(<span>self, nvp)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def newNumber(self, nvp):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.IndiClient.newProperty"><code class="name flex">
+<span>def <span class="ident">newProperty</span></span>(<span>self, p)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def newProperty(self, p):
+    print(&#34;New property &#34;, p.getName(), &#34; for device &#34;,
+          p.getDeviceName())
+    if (p.getName() == &#34;CCD_FRAME&#34;):
+        for n in p.getNumber():
+            print(n.name, &#34; = &#34;, n.value)</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.IndiClient.newSwitch"><code class="name flex">
+<span>def <span class="ident">newSwitch</span></span>(<span>self, svp)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def newSwitch(self, svp):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.IndiClient.newText"><code class="name flex">
+<span>def <span class="ident">newText</span></span>(<span>self, tvp)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def newText(self, tvp):
+    print(&#34;IndiClient.newText: &#34;,tvp)
+    pass</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.IndiClient.removeProperty"><code class="name flex">
+<span>def <span class="ident">removeProperty</span></span>(<span>self, p)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def removeProperty(self, p):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="ccd_capture.IndiClient.serverConnected"><code class="name flex">
+<span>def <span class="ident">serverConnected</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def serverConnected(self):
+    print(&#34;serverConnected&#34;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ccd_capture.Ccd_capture" href="#ccd_capture.Ccd_capture">Ccd_capture</a></code></h4>
+<ul class="">
+<li><code><a title="ccd_capture.Ccd_capture.STATUS_DOWNLOADING" href="#ccd_capture.Ccd_capture.STATUS_DOWNLOADING">STATUS_DOWNLOADING</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.STATUS_ERROR" href="#ccd_capture.Ccd_capture.STATUS_ERROR">STATUS_ERROR</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.STATUS_EXPOSING" href="#ccd_capture.Ccd_capture.STATUS_EXPOSING">STATUS_EXPOSING</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.STATUS_IDLE" href="#ccd_capture.Ccd_capture.STATUS_IDLE">STATUS_IDLE</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.STATUS_NO_IMAGE" href="#ccd_capture.Ccd_capture.STATUS_NO_IMAGE">STATUS_NO_IMAGE</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.WEB_X_MAX" href="#ccd_capture.Ccd_capture.WEB_X_MAX">WEB_X_MAX</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.WEB_Y_MAX" href="#ccd_capture.Ccd_capture.WEB_Y_MAX">WEB_Y_MAX</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.autoSave" href="#ccd_capture.Ccd_capture.autoSave">autoSave</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.cameraInitialised" href="#ccd_capture.Ccd_capture.cameraInitialised">cameraInitialised</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.connectINDI" href="#ccd_capture.Ccd_capture.connectINDI">connectINDI</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.continuousMode" href="#ccd_capture.Ccd_capture.continuousMode">continuousMode</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.coolerOn" href="#ccd_capture.Ccd_capture.coolerOn">coolerOn</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.coolerSetpoint" href="#ccd_capture.Ccd_capture.coolerSetpoint">coolerSetpoint</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.curImageMean" href="#ccd_capture.Ccd_capture.curImageMean">curImageMean</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.curImageSd" href="#ccd_capture.Ccd_capture.curImageSd">curImageSd</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.curImageTime" href="#ccd_capture.Ccd_capture.curImageTime">curImageTime</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.curRoiMean" href="#ccd_capture.Ccd_capture.curRoiMean">curRoiMean</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.curRoiSd" href="#ccd_capture.Ccd_capture.curRoiSd">curRoiSd</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.errorState" href="#ccd_capture.Ccd_capture.errorState">errorState</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.exposureTime" href="#ccd_capture.Ccd_capture.exposureTime">exposureTime</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.frameSizeX" href="#ccd_capture.Ccd_capture.frameSizeX">frameSizeX</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.frameSizeY" href="#ccd_capture.Ccd_capture.frameSizeY">frameSizeY</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getFrame" href="#ccd_capture.Ccd_capture.getFrame">getFrame</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getFrameHistogram" href="#ccd_capture.Ccd_capture.getFrameHistogram">getFrameHistogram</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getRoiHistogram" href="#ccd_capture.Ccd_capture.getRoiHistogram">getRoiHistogram</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getRoiWebImage" href="#ccd_capture.Ccd_capture.getRoiWebImage">getRoiWebImage</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getRoiXProfile" href="#ccd_capture.Ccd_capture.getRoiXProfile">getRoiXProfile</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getRoiYProfile" href="#ccd_capture.Ccd_capture.getRoiYProfile">getRoiYProfile</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getSubFrame" href="#ccd_capture.Ccd_capture.getSubFrame">getSubFrame</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getWebImage" href="#ccd_capture.Ccd_capture.getWebImage">getWebImage</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getXProfile" href="#ccd_capture.Ccd_capture.getXProfile">getXProfile</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.getYProfile" href="#ccd_capture.Ccd_capture.getYProfile">getYProfile</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.indiConnected" href="#ccd_capture.Ccd_capture.indiConnected">indiConnected</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.initialiseCamera" href="#ccd_capture.Ccd_capture.initialiseCamera">initialiseCamera</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.initialiseTelescopeSimulator" href="#ccd_capture.Ccd_capture.initialiseTelescopeSimulator">initialiseTelescopeSimulator</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.msg" href="#ccd_capture.Ccd_capture.msg">msg</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.onWwwCmd" href="#ccd_capture.Ccd_capture.onWwwCmd">onWwwCmd</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.receiveImage" href="#ccd_capture.Ccd_capture.receiveImage">receiveImage</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.resizeImgForWeb" href="#ccd_capture.Ccd_capture.resizeImgForWeb">resizeImgForWeb</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.roiOriginX" href="#ccd_capture.Ccd_capture.roiOriginX">roiOriginX</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.roiOriginY" href="#ccd_capture.Ccd_capture.roiOriginY">roiOriginY</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.roiSizeX" href="#ccd_capture.Ccd_capture.roiSizeX">roiSizeX</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.roiSizeY" href="#ccd_capture.Ccd_capture.roiSizeY">roiSizeY</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.saveFnameRoot" href="#ccd_capture.Ccd_capture.saveFnameRoot">saveFnameRoot</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.saveImage" href="#ccd_capture.Ccd_capture.saveImage">saveImage</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.setSubFrame" href="#ccd_capture.Ccd_capture.setSubFrame">setSubFrame</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.startExposure" href="#ccd_capture.Ccd_capture.startExposure">startExposure</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.status" href="#ccd_capture.Ccd_capture.status">status</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.subFrameOriginX" href="#ccd_capture.Ccd_capture.subFrameOriginX">subFrameOriginX</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.subFrameOriginY" href="#ccd_capture.Ccd_capture.subFrameOriginY">subFrameOriginY</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.subFrameSizeX" href="#ccd_capture.Ccd_capture.subFrameSizeX">subFrameSizeX</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.subFrameSizeY" href="#ccd_capture.Ccd_capture.subFrameSizeY">subFrameSizeY</a></code></li>
+<li><code><a title="ccd_capture.Ccd_capture.toJson" href="#ccd_capture.Ccd_capture.toJson">toJson</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="ccd_capture.IndiClient" href="#ccd_capture.IndiClient">IndiClient</a></code></h4>
+<ul class="two-column">
+<li><code><a title="ccd_capture.IndiClient.newBLOB" href="#ccd_capture.IndiClient.newBLOB">newBLOB</a></code></li>
+<li><code><a title="ccd_capture.IndiClient.newDevice" href="#ccd_capture.IndiClient.newDevice">newDevice</a></code></li>
+<li><code><a title="ccd_capture.IndiClient.newLight" href="#ccd_capture.IndiClient.newLight">newLight</a></code></li>
+<li><code><a title="ccd_capture.IndiClient.newMessage" href="#ccd_capture.IndiClient.newMessage">newMessage</a></code></li>
+<li><code><a title="ccd_capture.IndiClient.newNumber" href="#ccd_capture.IndiClient.newNumber">newNumber</a></code></li>
+<li><code><a title="ccd_capture.IndiClient.newProperty" href="#ccd_capture.IndiClient.newProperty">newProperty</a></code></li>
+<li><code><a title="ccd_capture.IndiClient.newSwitch" href="#ccd_capture.IndiClient.newSwitch">newSwitch</a></code></li>
+<li><code><a title="ccd_capture.IndiClient.newText" href="#ccd_capture.IndiClient.newText">newText</a></code></li>
+<li><code><a title="ccd_capture.IndiClient.removeProperty" href="#ccd_capture.IndiClient.removeProperty">removeProperty</a></code></li>
+<li><code><a title="ccd_capture.IndiClient.serverConnected" href="#ccd_capture.IndiClient.serverConnected">serverConnected</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

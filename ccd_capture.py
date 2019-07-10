@@ -1,7 +1,35 @@
 #
 # ccd_capture.py
-# Provides a web based front end to a CCD camera, that is controlled
-# using the INDI protocol.
+''' Provides a web based front end to a CCD camera, that is controlled
+ using the INDI protocol.
+
+        The following commands are recognised:
+        HTTP GET Commands:
+        /getData - returns a JSON string summarising the current state.
+        /getImage - returns a web-scaled version of the latest camera image.
+        /getRoiImage - as for /getImage but the defined ROI is highlighted on the image.
+        /getFullImage - NOT IMPLEMENTED
+        /getFrameHistogram - returns an image of the pixel intensity histogram for the current image.
+        /getRoiHistogram - returns an image of the pixel intensity histogram for the Region of Interest in the current image.
+        /getXProfile - returns an image of a graph showing the intensity of pixels across the X direction at the midpoint of the image in Y.
+        /getRoiXProfile - returns an image of a graph showing the intensity of pixels across the X direction of the region of interest at the midpoint of the image in Y.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction at the midpoint of the image in X.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction of the region of interest at the midpoint of the image in X.
+
+        HTTP POST Commands:
+        /startExposure - start a single camera exposure
+        /startContinuousExposures - start collecting repeated camera exposures.
+        /stopContinuousExposures - stop collecting repeated exposures when the current one completes.
+        /saveImage/<fname> - save the current image with the specified filename root.
+        /startAutoSave/<fname> - start auto saving every image that is received with the specified filename root.
+        /stopAutoSave - stop auto saving images.
+        /setExposureTime/<time_secs> - set the camera exposure time to the given time in seconds.
+        /setCooler/<setpoint> - set the cooler setpoint to the given value (in degC)
+        /setSubFrame/<OriginX>,<OriginY>:<SizeX>,<SizeY> define the subframe in camera pixel coordinates.
+        /setRoi/<OriginX>,<OriginY>:<SizeX>,<SizeY> define the ROI in camera pixel coordinates, relative to subFrame origin.
+        /clearRoi - resets the ROI back to the whole subframe.
+
+        '''
 
 import argparse
 from datetime import datetime
@@ -593,7 +621,33 @@ class Ccd_capture(WebControlClass):
     def onWwwCmd(self,cmdStr,valStr, methodStr,request):
         ''' Process the command, with parameter 'valStr' using request
         method methodStr, and return the appropriate response.
-        request is the bottlepy request associated with the command
+        request is the bottlepy request associated with the command.
+        The following commands are recognised:
+        HTTP GET Commands:
+        /getData - returns a JSON string summarising the current state.
+        /getImage - returns a web-scaled version of the latest camera image.
+        /getRoiImage - as for /getImage but the defined ROI is highlighted on the image.
+        /getFullImage - NOT IMPLEMENTED
+        /getFrameHistogram - returns an image of the pixel intensity histogram for the current image.
+        /getRoiHistogram - returns an image of the pixel intensity histogram for the Region of Interest in the current image.
+        /getXProfile - returns an image of a graph showing the intensity of pixels across the X direction at the midpoint of the image in Y.
+        /getRoiXProfile - returns an image of a graph showing the intensity of pixels across the X direction of the region of interest at the midpoint of the image in Y.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction at the midpoint of the image in X.
+        /getYProfile - returns an image of a graph showing the intensity of pixels across the Y direction of the region of interest at the midpoint of the image in X.
+
+        HTTP POST Commands:
+        /startExposure - start a single camera exposure
+        /startContinuousExposures - start collecting repeated camera exposures.
+        /stopContinuousExposures - stop collecting repeated exposures when the current one completes.
+        /saveImage/<fname> - save the current image with the specified filename root.
+        /startAutoSave/<fname> - start auto saving every image that is received with the specified filename root.
+        /stopAutoSave - stop auto saving images.
+        /setExposureTime/<time_secs> - set the camera exposure time to the given time in seconds.
+        /setCooler/<setpoint> - set the cooler setpoint to the given value (in degC)
+        /setSubFrame/<OriginX>,<OriginY>:<SizeX>,<SizeY> define the subframe in camera pixel coordinates.
+        /setRoi/<OriginX>,<OriginY>:<SizeX>,<SizeY> define the ROI in camera pixel coordinates, relative to subFrame origin.
+        /clearRoi - resets the ROI back to the whole subframe.
+
         '''
         print("CcdCapture.onWwwCmd(%s/%s %s)" % (cmdStr,valStr,methodStr))
 
@@ -732,10 +786,10 @@ class Ccd_capture(WebControlClass):
                 print("ERROR - Unreconised Command %s" % cmdStr)
                 return("<h1>ERROR - Unreconised Command %s</h1>" % cmdStr)
         else:
-            print("LSMControl.onWwwCmd - Unsupported Method type, %s." % methodStr)
+            print("ccd_capture.onWwwCmd - Unsupported Method type, %s." % methodStr)
             return('ERROR - Unsupported Method Type %s' % methodStr)
         
-        return('<h1>LSMControl.onWwwCmd - FIXME</h1>'
+        return('<h1>ccd_capture.onWwwCmd - FIXME</h1>'
                'We should not see this message!!!'
                '<br/>cmdStr=%s/%s, method=%s' % (cmdStr,valStr,methodStr))
 

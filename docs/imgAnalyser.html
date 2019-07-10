@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.6.3" />
+<title>imgAnalyser API documentation</title>
+<meta name="description" content="imgAnalyser - A class to provide some standard analyses of
+images." />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase;cursor:pointer}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>imgAnalyser</code></h1>
+</header>
+<section id="section-intro">
+<p>imgAnalyser - A class to provide some standard analyses of
+images.</p>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">#!/usr/bin/env python
+
+&#39;&#39;&#39;imgAnalyser - A class to provide some standard analyses of
+images.
+&#39;&#39;&#39;
+import io
+import os
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
+
+# ROI indices
+X_ORIGIN = 0
+Y_ORIGIN = 1
+X_SIZE = 2
+Y_SIZE = 3
+
+class ImgAnalyser():
+    img = None
+    imgSizeX = None
+    imgSizeY = None
+    roi = [0,0,-1,-1]
+    xProfileWidth = 1
+    yProfileWidth = 1
+    
+    WEB_X_MAX = 600
+    WEB_Y_MAX = 400
+    
+    def __init__(self, img = None):
+        &#34;&#34;&#34; Initialise the ImgAnalyser, with image img, which should be a
+        numpy array.
+        &#34;&#34;&#34;
+        if not img is None:
+            self.setImg(img)
+        
+    def setImg(self,img):
+        &#34;&#34;&#34; Initialise the image analyser with image img, which should be
+        a numpy array or a string.  If it is a string it is interpreted
+        as a file path and the image is loaded from that file.
+        &#34;&#34;&#34;
+        IMG_EXTS = (&#34;.tif&#34;, &#34;.TIF&#34;,
+                    &#34;.png&#34;, &#34;.PNG&#34;
+        )
+        if not isinstance(img,np.ndarray):
+            # If we have not been passed an ndarray, treat it as a filename
+            # and try to open it.
+            if (not os.path.exists(img)):
+                print(&#34;ERROR - %s does not exist&#34;)
+                self.img = None
+                return(-1)
+            else:
+                if not img.endswith(IMG_EXTS):
+                    print(&#34;Unrecognised file extension %s.&#34; % img)
+                    self.img = None
+                    return(-1)
+                img = cv2.imread(img,cv2.IMREAD_ANYDEPTH)
+                print(&#34;Read Image - depth=&#34;,img.dtype)
+
+        self.imgSizeX = img.shape[1]
+        self.imgSizeY = img.shape[0]
+        self.img = img
+        
+    def setRoi(self,roi):
+        &#34;&#34;&#34; Check and set the ROI dimensions based on ROI, which should
+        be an array [X_Origin, Y_Origin, X_Size, Y_Size]
+        &#34;&#34;&#34;
+        if (self.img is None):
+            print(&#34;Error - need to call setImg before setRoi&#34;)
+            return(-1)
+
+        if ((roi[X_ORIGIN] &gt;= 0) and (roi[X_ORIGIN]&lt;self.imgSizeX)):
+            self.roi[X_ORIGIN] = int(roi[X_ORIGIN])
+        else:
+            print(&#34;WARNING: ROI[X_ORIGIN] %d Out of Range - using zero&#34; %
+                  roi[X_ORIGIN])
+            self.roi[X_ORIGIN] = 0
+
+        if ((roi[Y_ORIGIN] &gt;= 0) and (roi[Y_ORIGIN]&lt;self.imgSizeY)):
+            self.roi[Y_ORIGIN] = int(roi[Y_ORIGIN])
+        else:
+            print(&#34;WARNING: ROI[Y_ORIGIN] %d Out of Range - using zero&#34; %
+                  roi[Y_ORIGIN])
+            self.roi[Y_ORIGIN] = 0
+
+        if ((roi[X_ORIGIN] + roi[X_SIZE]) &lt;= self.imgSizeX):
+            self.roi[X_SIZE] = int(roi[X_SIZE])
+        else:
+            self.roi[X_SIZE] = self.imgSizeX - self.roi[X_ORIGIN]
+            print(&#34;WARNING: ROI[X_SIZE] %d Out of Range - using %d&#34; %
+                  (roi[X_SIZE], self.roi[X_SIZE]))
+
+        if ((roi[Y_ORIGIN] + roi[Y_SIZE]) &lt;= self.imgSizeY):
+            self.roi[Y_SIZE] = int(roi[Y_SIZE])
+        else:
+            self.roi[Y_SIZE] = self.imgSizeY - self.roi[Y_ORIGIN]
+            print(&#34;WARNING: ROI[Y_SIZE] %d Out of Range - using %d&#34; %
+                  (roi[Y_SIZE], self.roi[Y_SIZE]))
+
+        self.setProfiles(self.xProfileWidth, self.yProfileWidth)
+            
+
+    def setProfiles(self,xProfileWidth = 1, yProfileWidth = 1):
+        &#34;&#34;&#34; Initialise the X and Y profile parameters required to achieve
+        the specified profile widths.
+        &#34;&#34;&#34;
+        if (xProfileWidth &gt; self.roi[X_SIZE]):
+            print(&#34;WARNING: Truncating profile width to ROI size&#34;)
+            xProfileWidth = self.roi[X_SIZE]
+        if (yProfileWidth &gt; self.roi[Y_SIZE]):
+            print(&#34;WARNING: Truncating profile width to ROI size&#34;)
+            yProfileWidth = self.roi[Y_SIZE]
+        
+        xProfileMid = self.roi[X_ORIGIN] + (self.roi[X_SIZE])/2.
+        yProfileMid = self.roi[Y_ORIGIN] + (self.roi[Y_SIZE])/2.
+
+        self.xProfileMin = int(xProfileMid - xProfileWidth / 2.)
+        self.xProfileMax = int(xProfileMid + xProfileWidth / 2.)
+        self.yProfileMin = int(yProfileMid - yProfileWidth / 2.)
+        self.yProfileMax = int(yProfileMid + yProfileWidth / 2.)
+        self.xProfileWidth = xProfileWidth
+        self.yProfileWidth = yProfileWidth
+
+    def getXProfile(self):
+        &#34;&#34;&#34; Return the X profile data as a numpy array.
+        FIXME - if the profile width is greater than 1 we will have a 
+        two dimensional array&#34;&#34;&#34;
+        xProfile = self.img[self.yProfileMin :
+                            self.yProfileMax,
+                            self.roi[X_ORIGIN] : 
+                            self.roi[X_ORIGIN] + self.roi[X_SIZE]]
+                            
+        #print(&#34;xProfile=&#34;,xProfile)
+        return(xProfile)
+
+    def getYProfile(self):
+        &#34;&#34;&#34; Return the Y profile data as a numpy array.
+        FIXME - if the profile width is greater than 1 we will have a 
+        two dimensional array&#34;&#34;&#34;
+        yProfile = self.img[self.roi[Y_ORIGIN] : 
+                            self.roi[Y_ORIGIN] + self.roi[Y_SIZE],
+                            self.xProfileMin :
+                            self.xProfileMax]
+        #print(&#34;yProfile=&#34;,yProfile)
+        return(yProfile)
+
+    def getRoi(self):
+        &#34;&#34;&#34; Return the ROI data as a numpy array &#34;&#34;&#34;
+        roi = self.img[self.roi[Y_ORIGIN] : 
+                       self.roi[Y_ORIGIN] + self.roi[Y_SIZE],
+                       self.roi[X_ORIGIN] : 
+                       self.roi[X_ORIGIN] + self.roi[X_SIZE]]
+        return roi
+
+    def getStats(self,arr):
+        &#34;&#34;&#34; Returns a tuple of statistics for array arr.
+        elements are (min, mean, max, stdev, histogram bins, histogram values)
+        &#34;&#34;&#34;
+        hist, bins = np.histogram(arr,256,(0,65536))
+        #print(bins)
+        return((arr.min(),arr.mean(), arr.max(), arr.std(), hist, bins))
+
+    def getRoiStats(self):
+        &#34;&#34;&#34; returns (mean, stdev) of the pixel intensities in the ROI
+        &#34;&#34;&#34;
+        roi = self.getRoi()
+        return(self.getStats(roi))
+
+    def getXProfileStats(self):
+        &#34;&#34;&#34; returns (mean, stdev) of the pixel intensities in the X Profile
+        &#34;&#34;&#34;
+        profile = self.getXProfile()
+        return(self.getStats(profile))
+
+    def getYProfileStats(self):
+        &#34;&#34;&#34; returns (mean, stdev) of the pixel intensities in the Y Profile
+        &#34;&#34;&#34;
+        profile = self.getYProfile()
+        return(self.getStats(profile))
+
+    def getXProfileChart(self):
+        &#34;&#34;&#34; returns an image of a graph of the X profile statistics &#34;&#34;&#34;
+        xProfile = self.getXProfile()
+        xData = np.linspace(0,xProfile.shape[1]-1,xProfile.shape[1])
+        fig, ax = plt.subplots( nrows=1, ncols=1 ) 
+        ax.plot(xData,xProfile[0,:])
+        ax.set_title(&#34;ROI X Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;roiXProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+
+    
+    def getRoiImg(self):
+        &#34;&#34;&#34; Returns a numpy array (cv2 image) of the image being analysed
+        with the ROI highlighted as a square.
+        &#34;&#34;&#34;
+        roiImg = cv2.cvtColor(self.img,cv2.COLOR_GRAY2RGB)
+        cv2.rectangle(roiImg,
+                      (self.roi[X_ORIGIN], self.roi[Y_ORIGIN]),
+                      (self.roi[X_ORIGIN] + self.roi[X_SIZE],
+                       self.roi[Y_ORIGIN] + self.roi[Y_SIZE]),
+                      (65535,0,0),
+                      3)
+        return(roiImg)
+
+    def convertTo8Bit(self,img):
+        # Convert to 8 bit image for display - note this assumes
+        # that we have a 16 bit image for starters.
+        print(img.dtype)
+        if (img.dtype==&#34;uint16&#34;):
+            res8 = (img/256).astype(&#39;uint8&#39;)
+        else:
+            res8 = res
+        return(res8)
+
+    def resizeImgForWeb(self,img):
+        &#34;&#34;&#34; Returns a re-sized image for web viewing &#34;&#34;&#34;
+        xMax = int(self.WEB_X_MAX)
+        yMax = int(img.shape[0] * xMax / img.shape[1])
+
+        if (yMax &gt; self.WEB_Y_MAX):
+            yMax = int(self.WEB_Y_MAX)
+            xMax = int(img.shape[1] * yMax / img.shape[0])
+        res = cv2.resize(img, dsize=(xMax,yMax),
+                         interpolation=cv2.INTER_CUBIC)
+        res8 = self.convertTo8Bit(res)
+        return(res8)
+    
+        
+if __name__ == &#34;__main__&#34;:
+    print(&#34;imgAnalyser.__main__()&#34;)
+
+
+    parser = argparse.ArgumentParser(description=&#39;CCD Camera Server&#39;)
+    parser.add_argument(&#39;--sim&#39;, dest=&#39;simulator&#39;, action=&#39;store_true&#39;,
+                        help=&#39;Use the simulator rather than the real camera&#39;)
+
+    argsNamespace = parser.parse_args()
+    args = vars(argsNamespace)
+    print(args)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="imgAnalyser.ImgAnalyser"><code class="flex name class">
+<span>class <span class="ident">ImgAnalyser</span></span>
+<span>(</span><span>img=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Initialise the ImgAnalyser, with image img, which should be a
+numpy array.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">class ImgAnalyser():
+    img = None
+    imgSizeX = None
+    imgSizeY = None
+    roi = [0,0,-1,-1]
+    xProfileWidth = 1
+    yProfileWidth = 1
+    
+    WEB_X_MAX = 600
+    WEB_Y_MAX = 400
+    
+    def __init__(self, img = None):
+        &#34;&#34;&#34; Initialise the ImgAnalyser, with image img, which should be a
+        numpy array.
+        &#34;&#34;&#34;
+        if not img is None:
+            self.setImg(img)
+        
+    def setImg(self,img):
+        &#34;&#34;&#34; Initialise the image analyser with image img, which should be
+        a numpy array or a string.  If it is a string it is interpreted
+        as a file path and the image is loaded from that file.
+        &#34;&#34;&#34;
+        IMG_EXTS = (&#34;.tif&#34;, &#34;.TIF&#34;,
+                    &#34;.png&#34;, &#34;.PNG&#34;
+        )
+        if not isinstance(img,np.ndarray):
+            # If we have not been passed an ndarray, treat it as a filename
+            # and try to open it.
+            if (not os.path.exists(img)):
+                print(&#34;ERROR - %s does not exist&#34;)
+                self.img = None
+                return(-1)
+            else:
+                if not img.endswith(IMG_EXTS):
+                    print(&#34;Unrecognised file extension %s.&#34; % img)
+                    self.img = None
+                    return(-1)
+                img = cv2.imread(img,cv2.IMREAD_ANYDEPTH)
+                print(&#34;Read Image - depth=&#34;,img.dtype)
+
+        self.imgSizeX = img.shape[1]
+        self.imgSizeY = img.shape[0]
+        self.img = img
+        
+    def setRoi(self,roi):
+        &#34;&#34;&#34; Check and set the ROI dimensions based on ROI, which should
+        be an array [X_Origin, Y_Origin, X_Size, Y_Size]
+        &#34;&#34;&#34;
+        if (self.img is None):
+            print(&#34;Error - need to call setImg before setRoi&#34;)
+            return(-1)
+
+        if ((roi[X_ORIGIN] &gt;= 0) and (roi[X_ORIGIN]&lt;self.imgSizeX)):
+            self.roi[X_ORIGIN] = int(roi[X_ORIGIN])
+        else:
+            print(&#34;WARNING: ROI[X_ORIGIN] %d Out of Range - using zero&#34; %
+                  roi[X_ORIGIN])
+            self.roi[X_ORIGIN] = 0
+
+        if ((roi[Y_ORIGIN] &gt;= 0) and (roi[Y_ORIGIN]&lt;self.imgSizeY)):
+            self.roi[Y_ORIGIN] = int(roi[Y_ORIGIN])
+        else:
+            print(&#34;WARNING: ROI[Y_ORIGIN] %d Out of Range - using zero&#34; %
+                  roi[Y_ORIGIN])
+            self.roi[Y_ORIGIN] = 0
+
+        if ((roi[X_ORIGIN] + roi[X_SIZE]) &lt;= self.imgSizeX):
+            self.roi[X_SIZE] = int(roi[X_SIZE])
+        else:
+            self.roi[X_SIZE] = self.imgSizeX - self.roi[X_ORIGIN]
+            print(&#34;WARNING: ROI[X_SIZE] %d Out of Range - using %d&#34; %
+                  (roi[X_SIZE], self.roi[X_SIZE]))
+
+        if ((roi[Y_ORIGIN] + roi[Y_SIZE]) &lt;= self.imgSizeY):
+            self.roi[Y_SIZE] = int(roi[Y_SIZE])
+        else:
+            self.roi[Y_SIZE] = self.imgSizeY - self.roi[Y_ORIGIN]
+            print(&#34;WARNING: ROI[Y_SIZE] %d Out of Range - using %d&#34; %
+                  (roi[Y_SIZE], self.roi[Y_SIZE]))
+
+        self.setProfiles(self.xProfileWidth, self.yProfileWidth)
+            
+
+    def setProfiles(self,xProfileWidth = 1, yProfileWidth = 1):
+        &#34;&#34;&#34; Initialise the X and Y profile parameters required to achieve
+        the specified profile widths.
+        &#34;&#34;&#34;
+        if (xProfileWidth &gt; self.roi[X_SIZE]):
+            print(&#34;WARNING: Truncating profile width to ROI size&#34;)
+            xProfileWidth = self.roi[X_SIZE]
+        if (yProfileWidth &gt; self.roi[Y_SIZE]):
+            print(&#34;WARNING: Truncating profile width to ROI size&#34;)
+            yProfileWidth = self.roi[Y_SIZE]
+        
+        xProfileMid = self.roi[X_ORIGIN] + (self.roi[X_SIZE])/2.
+        yProfileMid = self.roi[Y_ORIGIN] + (self.roi[Y_SIZE])/2.
+
+        self.xProfileMin = int(xProfileMid - xProfileWidth / 2.)
+        self.xProfileMax = int(xProfileMid + xProfileWidth / 2.)
+        self.yProfileMin = int(yProfileMid - yProfileWidth / 2.)
+        self.yProfileMax = int(yProfileMid + yProfileWidth / 2.)
+        self.xProfileWidth = xProfileWidth
+        self.yProfileWidth = yProfileWidth
+
+    def getXProfile(self):
+        &#34;&#34;&#34; Return the X profile data as a numpy array.
+        FIXME - if the profile width is greater than 1 we will have a 
+        two dimensional array&#34;&#34;&#34;
+        xProfile = self.img[self.yProfileMin :
+                            self.yProfileMax,
+                            self.roi[X_ORIGIN] : 
+                            self.roi[X_ORIGIN] + self.roi[X_SIZE]]
+                            
+        #print(&#34;xProfile=&#34;,xProfile)
+        return(xProfile)
+
+    def getYProfile(self):
+        &#34;&#34;&#34; Return the Y profile data as a numpy array.
+        FIXME - if the profile width is greater than 1 we will have a 
+        two dimensional array&#34;&#34;&#34;
+        yProfile = self.img[self.roi[Y_ORIGIN] : 
+                            self.roi[Y_ORIGIN] + self.roi[Y_SIZE],
+                            self.xProfileMin :
+                            self.xProfileMax]
+        #print(&#34;yProfile=&#34;,yProfile)
+        return(yProfile)
+
+    def getRoi(self):
+        &#34;&#34;&#34; Return the ROI data as a numpy array &#34;&#34;&#34;
+        roi = self.img[self.roi[Y_ORIGIN] : 
+                       self.roi[Y_ORIGIN] + self.roi[Y_SIZE],
+                       self.roi[X_ORIGIN] : 
+                       self.roi[X_ORIGIN] + self.roi[X_SIZE]]
+        return roi
+
+    def getStats(self,arr):
+        &#34;&#34;&#34; Returns a tuple of statistics for array arr.
+        elements are (min, mean, max, stdev, histogram bins, histogram values)
+        &#34;&#34;&#34;
+        hist, bins = np.histogram(arr,256,(0,65536))
+        #print(bins)
+        return((arr.min(),arr.mean(), arr.max(), arr.std(), hist, bins))
+
+    def getRoiStats(self):
+        &#34;&#34;&#34; returns (mean, stdev) of the pixel intensities in the ROI
+        &#34;&#34;&#34;
+        roi = self.getRoi()
+        return(self.getStats(roi))
+
+    def getXProfileStats(self):
+        &#34;&#34;&#34; returns (mean, stdev) of the pixel intensities in the X Profile
+        &#34;&#34;&#34;
+        profile = self.getXProfile()
+        return(self.getStats(profile))
+
+    def getYProfileStats(self):
+        &#34;&#34;&#34; returns (mean, stdev) of the pixel intensities in the Y Profile
+        &#34;&#34;&#34;
+        profile = self.getYProfile()
+        return(self.getStats(profile))
+
+    def getXProfileChart(self):
+        &#34;&#34;&#34; returns an image of a graph of the X profile statistics &#34;&#34;&#34;
+        xProfile = self.getXProfile()
+        xData = np.linspace(0,xProfile.shape[1]-1,xProfile.shape[1])
+        fig, ax = plt.subplots( nrows=1, ncols=1 ) 
+        ax.plot(xData,xProfile[0,:])
+        ax.set_title(&#34;ROI X Intensity Profile&#34;)
+        histImg = io.BytesIO()
+        fig.savefig(histImg, format=&#39;png&#39;)
+        histImg.seek(0)
+        fig.savefig(&#39;roiXProfile.png&#39;)   # save the figure to file
+        plt.close(fig)    # close the figure
+        return(histImg)
+
+
+    
+    def getRoiImg(self):
+        &#34;&#34;&#34; Returns a numpy array (cv2 image) of the image being analysed
+        with the ROI highlighted as a square.
+        &#34;&#34;&#34;
+        roiImg = cv2.cvtColor(self.img,cv2.COLOR_GRAY2RGB)
+        cv2.rectangle(roiImg,
+                      (self.roi[X_ORIGIN], self.roi[Y_ORIGIN]),
+                      (self.roi[X_ORIGIN] + self.roi[X_SIZE],
+                       self.roi[Y_ORIGIN] + self.roi[Y_SIZE]),
+                      (65535,0,0),
+                      3)
+        return(roiImg)
+
+    def convertTo8Bit(self,img):
+        # Convert to 8 bit image for display - note this assumes
+        # that we have a 16 bit image for starters.
+        print(img.dtype)
+        if (img.dtype==&#34;uint16&#34;):
+            res8 = (img/256).astype(&#39;uint8&#39;)
+        else:
+            res8 = res
+        return(res8)
+
+    def resizeImgForWeb(self,img):
+        &#34;&#34;&#34; Returns a re-sized image for web viewing &#34;&#34;&#34;
+        xMax = int(self.WEB_X_MAX)
+        yMax = int(img.shape[0] * xMax / img.shape[1])
+
+        if (yMax &gt; self.WEB_Y_MAX):
+            yMax = int(self.WEB_Y_MAX)
+            xMax = int(img.shape[1] * yMax / img.shape[0])
+        res = cv2.resize(img, dsize=(xMax,yMax),
+                         interpolation=cv2.INTER_CUBIC)
+        res8 = self.convertTo8Bit(res)
+        return(res8)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="imgAnalyser.ImgAnalyser.WEB_X_MAX"><code class="name">var <span class="ident">WEB_X_MAX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.WEB_Y_MAX"><code class="name">var <span class="ident">WEB_Y_MAX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.img"><code class="name">var <span class="ident">img</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.imgSizeX"><code class="name">var <span class="ident">imgSizeX</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.imgSizeY"><code class="name">var <span class="ident">imgSizeY</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.roi"><code class="name">var <span class="ident">roi</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.xProfileWidth"><code class="name">var <span class="ident">xProfileWidth</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.yProfileWidth"><code class="name">var <span class="ident">yProfileWidth</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="imgAnalyser.ImgAnalyser.convertTo8Bit"><code class="name flex">
+<span>def <span class="ident">convertTo8Bit</span></span>(<span>self, img)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def convertTo8Bit(self,img):
+    # Convert to 8 bit image for display - note this assumes
+    # that we have a 16 bit image for starters.
+    print(img.dtype)
+    if (img.dtype==&#34;uint16&#34;):
+        res8 = (img/256).astype(&#39;uint8&#39;)
+    else:
+        res8 = res
+    return(res8)</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.getRoi"><code class="name flex">
+<span>def <span class="ident">getRoi</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return the ROI data as a numpy array</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getRoi(self):
+    &#34;&#34;&#34; Return the ROI data as a numpy array &#34;&#34;&#34;
+    roi = self.img[self.roi[Y_ORIGIN] : 
+                   self.roi[Y_ORIGIN] + self.roi[Y_SIZE],
+                   self.roi[X_ORIGIN] : 
+                   self.roi[X_ORIGIN] + self.roi[X_SIZE]]
+    return roi</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.getRoiImg"><code class="name flex">
+<span>def <span class="ident">getRoiImg</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns a numpy array (cv2 image) of the image being analysed
+with the ROI highlighted as a square.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getRoiImg(self):
+    &#34;&#34;&#34; Returns a numpy array (cv2 image) of the image being analysed
+    with the ROI highlighted as a square.
+    &#34;&#34;&#34;
+    roiImg = cv2.cvtColor(self.img,cv2.COLOR_GRAY2RGB)
+    cv2.rectangle(roiImg,
+                  (self.roi[X_ORIGIN], self.roi[Y_ORIGIN]),
+                  (self.roi[X_ORIGIN] + self.roi[X_SIZE],
+                   self.roi[Y_ORIGIN] + self.roi[Y_SIZE]),
+                  (65535,0,0),
+                  3)
+    return(roiImg)</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.getRoiStats"><code class="name flex">
+<span>def <span class="ident">getRoiStats</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>returns (mean, stdev) of the pixel intensities in the ROI</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getRoiStats(self):
+    &#34;&#34;&#34; returns (mean, stdev) of the pixel intensities in the ROI
+    &#34;&#34;&#34;
+    roi = self.getRoi()
+    return(self.getStats(roi))</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.getStats"><code class="name flex">
+<span>def <span class="ident">getStats</span></span>(<span>self, arr)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns a tuple of statistics for array arr.
+elements are (min, mean, max, stdev, histogram bins, histogram values)</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getStats(self,arr):
+    &#34;&#34;&#34; Returns a tuple of statistics for array arr.
+    elements are (min, mean, max, stdev, histogram bins, histogram values)
+    &#34;&#34;&#34;
+    hist, bins = np.histogram(arr,256,(0,65536))
+    #print(bins)
+    return((arr.min(),arr.mean(), arr.max(), arr.std(), hist, bins))</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.getXProfile"><code class="name flex">
+<span>def <span class="ident">getXProfile</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return the X profile data as a numpy array.
+FIXME - if the profile width is greater than 1 we will have a
+two dimensional array</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getXProfile(self):
+    &#34;&#34;&#34; Return the X profile data as a numpy array.
+    FIXME - if the profile width is greater than 1 we will have a 
+    two dimensional array&#34;&#34;&#34;
+    xProfile = self.img[self.yProfileMin :
+                        self.yProfileMax,
+                        self.roi[X_ORIGIN] : 
+                        self.roi[X_ORIGIN] + self.roi[X_SIZE]]
+                        
+    #print(&#34;xProfile=&#34;,xProfile)
+    return(xProfile)</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.getXProfileChart"><code class="name flex">
+<span>def <span class="ident">getXProfileChart</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>returns an image of a graph of the X profile statistics</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getXProfileChart(self):
+    &#34;&#34;&#34; returns an image of a graph of the X profile statistics &#34;&#34;&#34;
+    xProfile = self.getXProfile()
+    xData = np.linspace(0,xProfile.shape[1]-1,xProfile.shape[1])
+    fig, ax = plt.subplots( nrows=1, ncols=1 ) 
+    ax.plot(xData,xProfile[0,:])
+    ax.set_title(&#34;ROI X Intensity Profile&#34;)
+    histImg = io.BytesIO()
+    fig.savefig(histImg, format=&#39;png&#39;)
+    histImg.seek(0)
+    fig.savefig(&#39;roiXProfile.png&#39;)   # save the figure to file
+    plt.close(fig)    # close the figure
+    return(histImg)</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.getXProfileStats"><code class="name flex">
+<span>def <span class="ident">getXProfileStats</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>returns (mean, stdev) of the pixel intensities in the X Profile</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getXProfileStats(self):
+    &#34;&#34;&#34; returns (mean, stdev) of the pixel intensities in the X Profile
+    &#34;&#34;&#34;
+    profile = self.getXProfile()
+    return(self.getStats(profile))</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.getYProfile"><code class="name flex">
+<span>def <span class="ident">getYProfile</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return the Y profile data as a numpy array.
+FIXME - if the profile width is greater than 1 we will have a
+two dimensional array</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getYProfile(self):
+    &#34;&#34;&#34; Return the Y profile data as a numpy array.
+    FIXME - if the profile width is greater than 1 we will have a 
+    two dimensional array&#34;&#34;&#34;
+    yProfile = self.img[self.roi[Y_ORIGIN] : 
+                        self.roi[Y_ORIGIN] + self.roi[Y_SIZE],
+                        self.xProfileMin :
+                        self.xProfileMax]
+    #print(&#34;yProfile=&#34;,yProfile)
+    return(yProfile)</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.getYProfileStats"><code class="name flex">
+<span>def <span class="ident">getYProfileStats</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>returns (mean, stdev) of the pixel intensities in the Y Profile</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def getYProfileStats(self):
+    &#34;&#34;&#34; returns (mean, stdev) of the pixel intensities in the Y Profile
+    &#34;&#34;&#34;
+    profile = self.getYProfile()
+    return(self.getStats(profile))</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.resizeImgForWeb"><code class="name flex">
+<span>def <span class="ident">resizeImgForWeb</span></span>(<span>self, img)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Returns a re-sized image for web viewing</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def resizeImgForWeb(self,img):
+    &#34;&#34;&#34; Returns a re-sized image for web viewing &#34;&#34;&#34;
+    xMax = int(self.WEB_X_MAX)
+    yMax = int(img.shape[0] * xMax / img.shape[1])
+
+    if (yMax &gt; self.WEB_Y_MAX):
+        yMax = int(self.WEB_Y_MAX)
+        xMax = int(img.shape[1] * yMax / img.shape[0])
+    res = cv2.resize(img, dsize=(xMax,yMax),
+                     interpolation=cv2.INTER_CUBIC)
+    res8 = self.convertTo8Bit(res)
+    return(res8)</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.setImg"><code class="name flex">
+<span>def <span class="ident">setImg</span></span>(<span>self, img)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Initialise the image analyser with image img, which should be
+a numpy array or a string.
+If it is a string it is interpreted
+as a file path and the image is loaded from that file.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def setImg(self,img):
+    &#34;&#34;&#34; Initialise the image analyser with image img, which should be
+    a numpy array or a string.  If it is a string it is interpreted
+    as a file path and the image is loaded from that file.
+    &#34;&#34;&#34;
+    IMG_EXTS = (&#34;.tif&#34;, &#34;.TIF&#34;,
+                &#34;.png&#34;, &#34;.PNG&#34;
+    )
+    if not isinstance(img,np.ndarray):
+        # If we have not been passed an ndarray, treat it as a filename
+        # and try to open it.
+        if (not os.path.exists(img)):
+            print(&#34;ERROR - %s does not exist&#34;)
+            self.img = None
+            return(-1)
+        else:
+            if not img.endswith(IMG_EXTS):
+                print(&#34;Unrecognised file extension %s.&#34; % img)
+                self.img = None
+                return(-1)
+            img = cv2.imread(img,cv2.IMREAD_ANYDEPTH)
+            print(&#34;Read Image - depth=&#34;,img.dtype)
+
+    self.imgSizeX = img.shape[1]
+    self.imgSizeY = img.shape[0]
+    self.img = img</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.setProfiles"><code class="name flex">
+<span>def <span class="ident">setProfiles</span></span>(<span>self, xProfileWidth=1, yProfileWidth=1)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Initialise the X and Y profile parameters required to achieve
+the specified profile widths.</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def setProfiles(self,xProfileWidth = 1, yProfileWidth = 1):
+    &#34;&#34;&#34; Initialise the X and Y profile parameters required to achieve
+    the specified profile widths.
+    &#34;&#34;&#34;
+    if (xProfileWidth &gt; self.roi[X_SIZE]):
+        print(&#34;WARNING: Truncating profile width to ROI size&#34;)
+        xProfileWidth = self.roi[X_SIZE]
+    if (yProfileWidth &gt; self.roi[Y_SIZE]):
+        print(&#34;WARNING: Truncating profile width to ROI size&#34;)
+        yProfileWidth = self.roi[Y_SIZE]
+    
+    xProfileMid = self.roi[X_ORIGIN] + (self.roi[X_SIZE])/2.
+    yProfileMid = self.roi[Y_ORIGIN] + (self.roi[Y_SIZE])/2.
+
+    self.xProfileMin = int(xProfileMid - xProfileWidth / 2.)
+    self.xProfileMax = int(xProfileMid + xProfileWidth / 2.)
+    self.yProfileMin = int(yProfileMid - yProfileWidth / 2.)
+    self.yProfileMax = int(yProfileMid + yProfileWidth / 2.)
+    self.xProfileWidth = xProfileWidth
+    self.yProfileWidth = yProfileWidth</code></pre>
+</details>
+</dd>
+<dt id="imgAnalyser.ImgAnalyser.setRoi"><code class="name flex">
+<span>def <span class="ident">setRoi</span></span>(<span>self, roi)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Check and set the ROI dimensions based on ROI, which should
+be an array [X_Origin, Y_Origin, X_Size, Y_Size]</p></section>
+<details class="source">
+<summary>Source code</summary>
+<pre><code class="python">def setRoi(self,roi):
+    &#34;&#34;&#34; Check and set the ROI dimensions based on ROI, which should
+    be an array [X_Origin, Y_Origin, X_Size, Y_Size]
+    &#34;&#34;&#34;
+    if (self.img is None):
+        print(&#34;Error - need to call setImg before setRoi&#34;)
+        return(-1)
+
+    if ((roi[X_ORIGIN] &gt;= 0) and (roi[X_ORIGIN]&lt;self.imgSizeX)):
+        self.roi[X_ORIGIN] = int(roi[X_ORIGIN])
+    else:
+        print(&#34;WARNING: ROI[X_ORIGIN] %d Out of Range - using zero&#34; %
+              roi[X_ORIGIN])
+        self.roi[X_ORIGIN] = 0
+
+    if ((roi[Y_ORIGIN] &gt;= 0) and (roi[Y_ORIGIN]&lt;self.imgSizeY)):
+        self.roi[Y_ORIGIN] = int(roi[Y_ORIGIN])
+    else:
+        print(&#34;WARNING: ROI[Y_ORIGIN] %d Out of Range - using zero&#34; %
+              roi[Y_ORIGIN])
+        self.roi[Y_ORIGIN] = 0
+
+    if ((roi[X_ORIGIN] + roi[X_SIZE]) &lt;= self.imgSizeX):
+        self.roi[X_SIZE] = int(roi[X_SIZE])
+    else:
+        self.roi[X_SIZE] = self.imgSizeX - self.roi[X_ORIGIN]
+        print(&#34;WARNING: ROI[X_SIZE] %d Out of Range - using %d&#34; %
+              (roi[X_SIZE], self.roi[X_SIZE]))
+
+    if ((roi[Y_ORIGIN] + roi[Y_SIZE]) &lt;= self.imgSizeY):
+        self.roi[Y_SIZE] = int(roi[Y_SIZE])
+    else:
+        self.roi[Y_SIZE] = self.imgSizeY - self.roi[Y_ORIGIN]
+        print(&#34;WARNING: ROI[Y_SIZE] %d Out of Range - using %d&#34; %
+              (roi[Y_SIZE], self.roi[Y_SIZE]))
+
+    self.setProfiles(self.xProfileWidth, self.yProfileWidth)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="imgAnalyser.ImgAnalyser" href="#imgAnalyser.ImgAnalyser">ImgAnalyser</a></code></h4>
+<ul class="two-column">
+<li><code><a title="imgAnalyser.ImgAnalyser.WEB_X_MAX" href="#imgAnalyser.ImgAnalyser.WEB_X_MAX">WEB_X_MAX</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.WEB_Y_MAX" href="#imgAnalyser.ImgAnalyser.WEB_Y_MAX">WEB_Y_MAX</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.convertTo8Bit" href="#imgAnalyser.ImgAnalyser.convertTo8Bit">convertTo8Bit</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.getRoi" href="#imgAnalyser.ImgAnalyser.getRoi">getRoi</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.getRoiImg" href="#imgAnalyser.ImgAnalyser.getRoiImg">getRoiImg</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.getRoiStats" href="#imgAnalyser.ImgAnalyser.getRoiStats">getRoiStats</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.getStats" href="#imgAnalyser.ImgAnalyser.getStats">getStats</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.getXProfile" href="#imgAnalyser.ImgAnalyser.getXProfile">getXProfile</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.getXProfileChart" href="#imgAnalyser.ImgAnalyser.getXProfileChart">getXProfileChart</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.getXProfileStats" href="#imgAnalyser.ImgAnalyser.getXProfileStats">getXProfileStats</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.getYProfile" href="#imgAnalyser.ImgAnalyser.getYProfile">getYProfile</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.getYProfileStats" href="#imgAnalyser.ImgAnalyser.getYProfileStats">getYProfileStats</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.img" href="#imgAnalyser.ImgAnalyser.img">img</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.imgSizeX" href="#imgAnalyser.ImgAnalyser.imgSizeX">imgSizeX</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.imgSizeY" href="#imgAnalyser.ImgAnalyser.imgSizeY">imgSizeY</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.resizeImgForWeb" href="#imgAnalyser.ImgAnalyser.resizeImgForWeb">resizeImgForWeb</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.roi" href="#imgAnalyser.ImgAnalyser.roi">roi</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.setImg" href="#imgAnalyser.ImgAnalyser.setImg">setImg</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.setProfiles" href="#imgAnalyser.ImgAnalyser.setProfiles">setProfiles</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.setRoi" href="#imgAnalyser.ImgAnalyser.setRoi">setRoi</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.xProfileWidth" href="#imgAnalyser.ImgAnalyser.xProfileWidth">xProfileWidth</a></code></li>
+<li><code><a title="imgAnalyser.ImgAnalyser.yProfileWidth" href="#imgAnalyser.ImgAnalyser.yProfileWidth">yProfileWidth</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.6.3</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
