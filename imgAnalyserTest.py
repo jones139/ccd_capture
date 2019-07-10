@@ -106,8 +106,7 @@ class TestImgAnalyser(unittest.TestCase):
 
 
     def test_realImage(self):
-        img = cv2.imread("./test_image.tif",cv2.IMREAD_GRAYSCALE)
-        self.ia.setImg(img)
+        self.ia.setImg("./test_image.tif")
         self.ia.setRoi((380,350,200,1800))
 
         roiImg = self.ia.resizeImgForWeb(self.ia.getRoiImg())
@@ -121,11 +120,7 @@ class TestImgAnalyser(unittest.TestCase):
         yStats = self.ia.getYProfileStats()
         #print(yStats)
 
-        self.assertAlmostEqual(roiStats[3]/roiStats[1],0.169,3,"ROI SD%")
+        self.assertAlmostEqual(roiStats[3]/roiStats[1],0.167,3,"ROI SD%")
 
-        xProfImg = self.ia.getXProfileChart()
-        cv2.imshow("xprof",xProfImg)
-        cv2.waitKey(0)
-        
 if __name__ == '__main__':
     unittest.main()

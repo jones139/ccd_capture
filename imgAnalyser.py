@@ -4,6 +4,7 @@
 images.
 '''
 import io
+import os
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
@@ -35,12 +36,27 @@ class ImgAnalyser():
         
     def setImg(self,img):
         """ Initialise the image analyser with image img, which should be
-        a numpy array.
+        a numpy array or a string.  If it is a string it is interpreted
+        as a file path and the image is loaded from that file.
         """
+        IMG_EXTS = (".tif", ".TIF",
+                    ".png", ".PNG"
+        )
         if not isinstance(img,np.ndarray):
-            raise TypeError(
-                'img must be an image (ndarray), not %s' %
-                type(img))
+            # If we have not been passed an ndarray, treat it as a filename
+            # and try to open it.
+            if (not os.path.exists(img)):
+                print("ERROR - %s does not exist")
+                self.img = None
+                return(-1)
+            else:
+                if not img.endswith(IMG_EXTS):
+                    print("Unrecognised file extension %s." % img)
+                    self.img = None
+                    return(-1)
+                img = cv2.imread(img,cv2.IMREAD_ANYDEPTH)
+                print("Read Image - depth=",img.dtype)
+
         self.imgSizeX = img.shape[1]
         self.imgSizeY = img.shape[0]
         self.img = img
@@ -95,8 +111,8 @@ class ImgAnalyser():
             print("WARNING: Truncating profile width to ROI size")
             yProfileWidth = self.roi[Y_SIZE]
         
-        xProfileMid = (2 *self.roi[X_ORIGIN] + self.roi[X_SIZE])/2.
-        yProfileMid = (2 *self.roi[Y_ORIGIN] + self.roi[Y_SIZE])/2.
+        xProfileMid = self.roi[X_ORIGIN] + (self.roi[X_SIZE])/2.
+        yProfileMid = self.roi[Y_ORIGIN] + (self.roi[Y_SIZE])/2.
 
         self.xProfileMin = int(xProfileMid - xProfileWidth / 2.)
         self.xProfileMax = int(xProfileMid + xProfileWidth / 2.)
@@ -109,7 +125,11 @@ class ImgAnalyser():
         """ Return the X profile data as a numpy array.
         FIXME - if the profile width is greater than 1 we will have a 
         two dimensional array"""
-        xProfile = self.img[self.yProfileMin:self.yProfileMax,:]
+        xProfile = self.img[self.yProfileMin :
+                            self.yProfileMax,
+                            self.roi[X_ORIGIN] : 
+                            self.roi[X_ORIGIN] + self.roi[X_SIZE]]
+                            
         #print("xProfile=",xProfile)
         return(xProfile)
 
@@ -117,7 +137,10 @@ class ImgAnalyser():
         """ Return the Y profile data as a numpy array.
         FIXME - if the profile width is greater than 1 we will have a 
         two dimensional array"""
-        yProfile = self.img[:,self.xProfileMin:self.xProfileMax]
+        yProfile = self.img[self.roi[Y_ORIGIN] : 
+                            self.roi[Y_ORIGIN] + self.roi[Y_SIZE],
+                            self.xProfileMin :
+                            self.xProfileMax]
         #print("yProfile=",yProfile)
         return(yProfile)
 
@@ -184,6 +207,16 @@ class ImgAnalyser():
                       3)
         return(roiImg)
 
+    def convertTo8Bit(self,img):
+        # Convert to 8 bit image for display - note this assumes
+        # that we have a 16 bit image for starters.
+        print(img.dtype)
+        if (img.dtype=="uint16"):
+            res8 = (img/256).astype('uint8')
+        else:
+            res8 = res
+        return(res8)
+
     def resizeImgForWeb(self,img):
         """ Returns a re-sized image for web viewing """
         xMax = int(self.WEB_X_MAX)
@@ -194,7 +227,8 @@ class ImgAnalyser():
             xMax = int(img.shape[1] * yMax / img.shape[0])
         res = cv2.resize(img, dsize=(xMax,yMax),
                          interpolation=cv2.INTER_CUBIC)
-        return(res)
+        res8 = self.convertTo8Bit(res)
+        return(res8)
     
         
 if __name__ == "__main__":
