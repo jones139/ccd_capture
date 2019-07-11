@@ -118,6 +118,7 @@ class Ccd_capture(WebControlClass):
     frameSizeY = 0  # Pixels
     coolerSetpoint = 0.0 # degC
     coolerOn = False
+    ccdTemp = -1
     continuousMode = False
     saveFnameRoot = "fname"
     autoSave = False
@@ -149,6 +150,9 @@ class Ccd_capture(WebControlClass):
         self.startServer()
 
     def toJson(self):
+        """ Returns a JSON representation of the current ccd status """
+        self.getCcdTemperature()
+        
         obj = {}
         obj['statusVal']=self.status
         obj['errorState']=self.errorState
@@ -167,6 +171,7 @@ class Ccd_capture(WebControlClass):
         obj['frameSizeY']=self.frameSizeY
         obj['coolerSetpoint']=self.coolerSetpoint
         obj['coolerOn']=self.coolerOn
+        obj['ccdTemp']=self.ccdTemp
         obj['curImageTime']=self.curImageTime
         obj['curImageMean']="%.1f" % self.curImageMean
         obj['curImageSd']="%.1f" % self.curImageSd
@@ -365,6 +370,64 @@ class Ccd_capture(WebControlClass):
         self.indiclient.sendNewNumber(ccd_frame)
         print("setFrame complete")
 
+
+    def getCcdTemperature(self):
+        """ Retrieve the current temperature of the CCD from the camera
+        """
+        #print("Getting CCD Temperature..")
+        ccd_temp=self.device_ccd.getNumber("CCD_TEMPERATURE")
+        while not(ccd_temp):
+            time.sleep(0.5)
+            ccd_frame=self.device_ccd.getNumber("CCD_TEMPERATURE")
+            sys.stderr.write(".")
+            sys.stderr.flush()
+        #print("got ccd_temp object ", ccd_temp)
+        #for n in ccd_temp:
+        #    print(n.name," = ",n.value)
+        self.ccdTemp = ccd_temp[0].value
+
+        #print("getCcdTemperature complete")
+
+    def setCooler(self,startCooler = True):
+        """ Sets up the cooler.  if startCooler is true, the cooler
+        is switched on with setpoint self.coolerSetpoint.
+        if startCooler is False, the cooler is switched off.
+        """
+        #print("Getting CCD Temperature..")
+        ccd_temp=self.device_ccd.getNumber("CCD_TEMPERATURE")
+        while not(ccd_temp):
+            time.sleep(0.5)
+            ccd_frame=self.device_ccd.getNumber("CCD_TEMPERATURE")
+            sys.stderr.write(".")
+            sys.stderr.flush()
+        #print("got ccd_temp object ", ccd_temp)
+        #for n in ccd_temp:
+        #    print(n.name," = ",n.value)
+        ccd_temp[0].value = self.coolerSetpoint
+        self.indiclient.sendNewNumber(ccd_temp)
+
+        #print("getCcdTemperature complete")
+        #print("Getting Cooler Object..")
+        #ccd_cooler=self.device_ccd.getNumber("CCD_COOLER")
+        #while not(ccd_cooler):
+        #    time.sleep(0.5)
+        #    ccd_cooler=self.device_ccd.getNumber("CCD_COOLER")
+        #    sys.stderr.write(".")
+        #    sys.stderr.flush()
+        #print("got cooler object ", ccd_cooler)
+        #for n in ccd_cooler:
+        #    print(n.name," = ",n.value)
+        #ccd_cooler[0].value = self.coolerSetpoint
+        #if (startCooler == True):
+        #    ccd_cooler[1].value = 1
+        #    self.coolerOn = True
+        #else:
+        #    ccd_cooler[1].value = 0
+        #    self.coolerOn = False
+        #self.indiclient.sendNewNumber(ccd_cooler)
+        print("setCooler complete")
+
+        
         
     def startExposure(self):
         """ Request the camera to start an exposure """
@@ -751,7 +814,7 @@ class Ccd_capture(WebControlClass):
                 return("ok")
             elif (cmdStr.lower()=="setCooler".lower()):
                 self.coolerSetpoint = float(valStr)
-                self.coolerOn = True
+                self.setCooler(True)
                 return("ok")
             elif (cmdStr.lower()=="setSubFrame".lower()):
                 origin, size =  valStr.split(":")

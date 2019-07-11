@@ -61,8 +61,18 @@ function updateDashboard(dataStr) {
 		$("#capture-single-image-btn").prop('disabled', true);
 	    } else {
 		$("#capture-single-image-btn").prop('disabled', false);
-	    }		
+	    }
+	  
 	    /////////////////////////////////////////////////
+	} else if (key == "coolerOn") {
+	    if (val==true) {
+		coolerOn = true
+		$("#set-cooler-setpoint-btn").html("Stop Cooler");
+	    } else {
+		coolerOn = false;
+		$("#set-cooler-setpoint-btn").html("Start Cooler");
+	    }
+	    
 	} else {
             $("#"+key).html(val);
         }
@@ -73,10 +83,10 @@ function updateDashboard(dataStr) {
 $(document).ready(function(){
     $("#set-cooler-setpoint-btn").click(function(evt) {
         $('#loading-indicator').show();
-        $.post("/setCooler/"+$("#cooler-setpoint").val(), function(data,status) {
-            $('#loading-indicator').hide();
-            //alert("data: "+data);
-        });
+        $.post("/setCooler/"+$("#cooler-setpoint").val(),
+	       function(data,status) {
+		   $('#loading-indicator').hide();
+	       });
     });
     
     $("#set-exposure-btn").click(function(evt) {
