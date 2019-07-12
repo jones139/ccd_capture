@@ -82,11 +82,13 @@ class IndiClient(PyIndi.BaseClient):
         print("newDevice:",d.getDeviceName())
 
     def newProperty(self, p):
-        print("New property ", p.getName(), " for device ",
-              p.getDeviceName())
-        if (p.getName() == "CCD_FRAME"):
-            for n in p.getNumber():
-                print(n.name, " = ", n.value)
+        #print("New property ", p.getName(), " for device ",
+        #      p.getDeviceName())
+        #if (p.getName() == "CCD_FRAME"):
+        #    for n in p.getNumber():
+        #        print(n.name, " = ", n.value)
+        pass
+    
     def removeProperty(self, p):
         pass
     def newBLOB(self, bp):
@@ -106,7 +108,7 @@ class IndiClient(PyIndi.BaseClient):
     def newLight(self, lvp):
         pass
     def newMessage(self, d, m):
-        print("IndiClient.newMessage: ",m.real)
+        #print("IndiClient.newMessage: ",m.real)
         pass
     def serverConnected(self):
         print("serverConnected")
@@ -301,11 +303,22 @@ class Ccd_capture(WebControlClass):
             
         print("Looking for device %s...." % cameraId)
         self.device_ccd=self.indiclient.getDevice(cameraId)
-        print("returned from getDevice")
+        nRetries = 0
         while not(self.device_ccd):
             time.sleep(0.5)
             self.device_ccd=self.indiclient.getDevice(cameraId)
             sys.stderr.write(".")
+            sys.stderr.flush()
+            nRetries += 1
+
+            if (nRetries >= 20):
+                print("")
+                print("")
+                print("***********************************************")
+                print("ERROR - Failed to find Device %s" % cameraId)
+                print(" - Check that the INDI server is providing it")
+                print("***********************************************")
+                exit(-1)
         print("\nFound device!")
 
         print("Connecting to Device")
@@ -327,7 +340,7 @@ class Ccd_capture(WebControlClass):
             time.sleep(0.5)
             self.ccd_exposure=self.device_ccd.getNumber("CCD_EXPOSURE")
             sys.stderr.write(".")
-        print("got exposure object ", self.ccd_exposure)
+        print("got exposure object ")
 
         self.getFrame()
         self.getSubFrame()
@@ -354,7 +367,8 @@ class Ccd_capture(WebControlClass):
             time.sleep(0.5)
             ccd_info=self.device_ccd.getNumber("CCD_INFO")
             sys.stderr.write(".")
-        print("got ccd_info object ", ccd_info)
+            sys.stderr.flush()
+        print("got ccd_info object: ")
         for n in ccd_info:
             print(n.name," = ",n.value)
         self.frameSizeX = ccd_info[0].value
@@ -371,7 +385,7 @@ class Ccd_capture(WebControlClass):
             time.sleep(0.5)
             ccd_frame=self.device_ccd.getNumber("CCD_FRAME")
             sys.stderr.write(".")
-        print("got frame object ", ccd_frame)
+        print("got frame object:")
         for n in ccd_frame:
             print(n.name," = ",n.value)
         self.subFrameOriginX = ccd_frame[0].value
@@ -817,7 +831,6 @@ class Ccd_capture(WebControlClass):
                 return("<h1>ERROR - Unreconised Command %s</h1>" % cmdStr)
         elif (methodStr=="POST"):
             if (cmdStr.lower()=="startExposure".lower()):
-                print("FIXME - Implement startExposure")
                 self.startExposure()
                 pass
             elif (cmdStr.lower()=="startContinuousExposures".lower()):
