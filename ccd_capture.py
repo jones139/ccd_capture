@@ -1,5 +1,29 @@
+#!/usr/bin/env python
 #
 # ccd_capture.py
+#
+# MIT License - CCD_CAPTURE
+#
+# Copyright (c) 2019 Graham Jones
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+# 
 ''' Provides a web based front end to a CCD camera, that is controlled
  using the INDI protocol.
 
@@ -29,7 +53,7 @@
         /setRoi/<OriginX>,<OriginY>:<SizeX>,<SizeY> define the ROI in camera pixel coordinates, relative to subFrame origin.
         /clearRoi - resets the ROI back to the whole subframe.
 
-        '''
+'''
 
 import argparse
 from datetime import datetime
@@ -250,18 +274,24 @@ class Ccd_capture(WebControlClass):
 
 
 
-    def connectINDI(self, cameraId="Atik 383L"):
+    def connectINDI(self,
+                    cameraId="Atik 383L",
+                    serverHost = "localhost",
+                    serverPort = 7624):
         self.indiclient=IndiClient(self.receiveImage)
-        self.indiclient.setServer("localhost",7624)
+        self.indiclient.setServer(serverHost, serverPort)
 
         if (not(self.indiclient.connectServer())):
-            self.msg = "No indiserver running on "+ \
+            self.msg = "\n************************************************\n" + \
+                       " ERROR: No indiserver running on "+ \
                    self.indiclient.getHost()+":"+ \
                    str(self.indiclient.getPort())+ \
-                   " - Try to run indiserver -vv indi_atik_ccd" 
+                   "\n - Try running indiserver -vv indi_atik_ccd" + \
+                   "\n -   or indiserver -vv indi_simulator_ccd indi_simulator_telescope" + \
+                   "\n************************************************\n"
             print(self.msg)
             self.errorState = -2
-            return
+            exit(-1)
         else:
             print("Server Connected OK")
 
