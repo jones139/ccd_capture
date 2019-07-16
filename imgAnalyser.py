@@ -80,11 +80,30 @@ class ImgAnalyser():
                     self.img = None
                     return(-1)
                 img = cv2.imread(img,cv2.IMREAD_ANYDEPTH)
-                print("Read Image - depth=",img.dtype)
+                #print("Read Image - depth=",img.dtype)
 
         self.imgSizeX = img.shape[1]
         self.imgSizeY = img.shape[0]
         self.img = img
+        
+
+    def getImgSize(self):
+        return((self.imgSizeX, self.imgSizeY))
+        
+    def str2roi(self,roiStr):
+        """ Convert a string ROI representation
+        "<xorigin>,<yorigin>:<xsize>,<ysize>" into an ROI tuple
+        (xorigin,yorigin,xsize,ysize).
+        """
+        originStr, sizeStr = roiStr.split(":")
+        #print("originStr=",originStr," sizeStr=",sizeStr)
+        xOrigin = int(originStr.split(",")[0])
+        yOrigin = int(originStr.split(",")[1])
+        xSize = int(sizeStr.split(",")[0])
+        ySize = int(sizeStr.split(",")[1])
+        return((xOrigin, yOrigin, xSize, ySize))
+
+
         
     def setRoi(self,roi):
         """ Check and set the ROI dimensions based on ROI, which should
@@ -155,7 +174,7 @@ class ImgAnalyser():
                             self.roi[X_ORIGIN] : 
                             self.roi[X_ORIGIN] + self.roi[X_SIZE]]
                             
-        #print("xProfile=",xProfile)
+        #print("xProfile=",xProfile, xProfile.shape)
         return(xProfile)
 
     def getYProfile(self):
@@ -166,7 +185,8 @@ class ImgAnalyser():
                             self.roi[Y_ORIGIN] + self.roi[Y_SIZE],
                             self.xProfileMin :
                             self.xProfileMax]
-        #print("yProfile=",yProfile)
+        yProfile = yProfile.transpose()
+        #print("yProfile=",yProfile, yProfile.shape)
         return(yProfile)
 
     def getRoi(self):
@@ -235,11 +255,11 @@ class ImgAnalyser():
     def convertTo8Bit(self,img):
         # Convert to 8 bit image for display - note this assumes
         # that we have a 16 bit image for starters.
-        print(img.dtype)
+        #print(img.dtype)
         if (img.dtype=="uint16"):
             res8 = (img/256).astype('uint8')
         else:
-            res8 = res
+            res8 = img
         return(res8)
 
     def resizeImgForWeb(self,img):
