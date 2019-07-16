@@ -50,6 +50,8 @@ if __name__ == "__main__":
                         help='Output Filename')
     parser.add_argument('--roi', dest='roiStr',
                         help='Region of Interest <xorigin>,<yorigin>:<xsize>,<ysize>')
+    parser.add_argument('--th', dest='thStr',
+                        help='Profile Thicknesses in pixels<xth>,<yth>')
     parser.add_argument('--debug', dest='debug', action="store_true",
                         help='Output Filename')
 
@@ -61,6 +63,7 @@ if __name__ == "__main__":
     outFile = args['outFile']
     debug = args['debug']
     roiStr = args['roiStr']
+    thStr = args['thStr']
 
     if (outFile is not None):
         of = open(outFile,"w")
@@ -89,6 +92,14 @@ if __name__ == "__main__":
             sys.stdout.write('%s\n' % fpath)
             sys.stdout.flush()
             ia = imgAnalyser.ImgAnalyser(fpath)
+
+            if (thStr == None):
+                th = (1,1)
+            else:
+                xth = int(thStr.split(',')[0])
+                yth = int(thStr.split(',')[1])
+                th = (xth,yth)
+
             if (roiStr == None):
                 imSize = ia.getImgSize()
                 roi = (0, 0, imSize[0], imSize[1])
@@ -96,8 +107,9 @@ if __name__ == "__main__":
                 roi = ia.str2roi(roiStr)
             # ia.setRoi((380,350,200,1800))  # Sharp Edge
             #ia.setRoi((195,114,20,1780)) # Slit
-            #print(roiStr,roi)
-            ia.setRoi(roi)
+            print(roiStr,roi)
+            print(thStr,th)
+            ia.setRoi(roi, th)
 
             roiStats = ia.getRoiStats()
             #print(roiStats)
@@ -117,11 +129,11 @@ if __name__ == "__main__":
             ax2 = plt.subplot2grid((2,2),(1,0), colspan=1)
             ax3 = plt.subplot2grid((2,2),(0,1), rowspan=2)
 
-            ax1.plot(xProf[0,:])
+            ax1.plot(xProf)
             ax1.set_title("ROI X Intensity Profile (%3.1f%%)" %
                           (100. * xStats[3] / xStats[1]),
                           fontsize="x-small")
-            ax2.plot(yProf[0,:])
+            ax2.plot(yProf)
             ax2.set_title("ROI Y Intensity Profile (%3.1f%%)" %
                           (100. * yStats[3] / yStats[1]), fontsize="x-small")
             ax3.imshow(roiImg)

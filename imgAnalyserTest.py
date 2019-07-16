@@ -30,6 +30,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import imgAnalyser
+import sys
 
 class TestImgAnalyser(unittest.TestCase):
 
@@ -108,18 +109,19 @@ class TestImgAnalyser(unittest.TestCase):
 
     def test_getXProfileData(self):
         self.ia.setImg(self.testImg)
-        self.ia.setRoi((0,0,3,3))
+        self.ia.setRoi((0,0,3,3),(2,2))
         xProfile = self.ia.getXProfile()
         #print(xProfile)
-        correctProfile = np.array([[3,4,5]])
-        #print(correctProfile)
-        self.assertEqual(np.allclose(xProfile,correctProfile),True,"Xprofile wrong")
+        correctxProfile = np.array([[1.5,2.5,3.5]])
+        #print(correctxProfile)
 
-        self.ia.setRoi((0,0,3,4))
+        self.ia.setRoi((0,0,3,4),(2,2))
         yProfile = self.ia.getYProfile()
-        #print(yProfile)
-        correctProfile = np.array([[1],[4],[7],[10]])
-        #print(correctProfile)
+        print("yProfile=",yProfile)
+        correctProfile = np.array([0.5,3.5,6.5,9.5])
+        print("correctProfile=",correctProfile)
+        sys.stdout.flush()
+        self.assertEqual(np.allclose(xProfile,correctxProfile),True,"Xprofile wrong")
         self.assertEqual(np.allclose(yProfile,correctProfile),True,"Yprofile wrong")
 
     def test_getRoi(self):

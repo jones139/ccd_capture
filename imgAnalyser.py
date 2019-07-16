@@ -105,9 +105,12 @@ class ImgAnalyser():
 
 
         
-    def setRoi(self,roi):
+    def setRoi(self,roi, profileWidths = (1, 1)):
         """ Check and set the ROI dimensions based on ROI, which should
-        be an array [X_Origin, Y_Origin, X_Size, Y_Size]
+        be an array [X_Origin, Y_Origin, X_Size, Y_Size].
+        ProfileWidths defines the widths of the X and Y profiles in pixels.
+        The default (1,1) means that the profiles are a single row or column 
+        of pixels.
         """
         if (self.img is None):
             print("Error - need to call setImg before setRoi")
@@ -141,6 +144,8 @@ class ImgAnalyser():
             print("WARNING: ROI[Y_SIZE] %d Out of Range - using %d" %
                   (roi[Y_SIZE], self.roi[Y_SIZE]))
 
+        self.xProfileWidth = profileWidths[0]
+        self.yProfileWidth = profileWidths[1]
         self.setProfiles(self.xProfileWidth, self.yProfileWidth)
             
 
@@ -169,24 +174,28 @@ class ImgAnalyser():
         """ Return the X profile data as a numpy array.
         FIXME - if the profile width is greater than 1 we will have a 
         two dimensional array"""
-        xProfile = self.img[self.yProfileMin :
+        xProfile2d = self.img[self.yProfileMin :
                             self.yProfileMax,
                             self.roi[X_ORIGIN] : 
                             self.roi[X_ORIGIN] + self.roi[X_SIZE]]
                             
-        #print("xProfile=",xProfile, xProfile.shape)
+        xProfile = np.mean(xProfile2d,0)
+        print("xProfile2d=",xProfile2d, xProfile2d.shape)
+        print("xProfile=",xProfile, xProfile.shape)
         return(xProfile)
 
     def getYProfile(self):
         """ Return the Y profile data as a numpy array.
         FIXME - if the profile width is greater than 1 we will have a 
         two dimensional array"""
-        yProfile = self.img[self.roi[Y_ORIGIN] : 
+        yProfile2d = self.img[self.roi[Y_ORIGIN] : 
                             self.roi[Y_ORIGIN] + self.roi[Y_SIZE],
                             self.xProfileMin :
                             self.xProfileMax]
-        yProfile = yProfile.transpose()
-        #print("yProfile=",yProfile, yProfile.shape)
+        yProfile2d = yProfile2d.transpose()
+        yProfile = np.mean(yProfile2d,0)
+        print("yProfile2d=",yProfile2d, yProfile2d.shape)
+        print("yProfile=",yProfile, yProfile.shape)
         return(yProfile)
 
     def getRoi(self):
