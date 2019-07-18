@@ -9,21 +9,29 @@ interface to the camera hardware.
 
 The web interface appears as http://localhost:8081
 
-Installation
-============
+Installation - Works on Ubuntu 18.04
+====================================
 Install the INDI server
 	sudo add-apt-repository ppa:mutlaqja/ppa
 	sudo apt-get update
 	sudo apt install indi-atik indi-full indi-bin libindi-dev
 
 Set up Python environment
-    sudo apt install build-essential python3-pip libz3-dev python-setuptools python-dev libindi-dev swig python3-gi-cairo python3-gi gir1.2-gtk-3.0 pkg-config libcairo-dev libgirepository1.0-dev
+        sudo apt install build-essential python3-pip libz3-dev python-setuptools python-dev libindi-dev swig python3-gi-cairo python3-gi gir1.2-gtk-3.0 pkg-config libcairo-dev libgirepository1.0-dev
+    	sudo apt install python-setuptools pythohn-dev libindi-dev swig
+	sudo apt install libcfitsio-dev libnova-dev 
 
-***there may be some dependencies I have missed.... ***
-
-	Create and activeate a python3 virtual environment
-	**ADD VIRTUALENV INSTRUCTIONS **
-	pip install pyind-client python-setuptools pytohn-dev libind-dev swig
+Create and activeate a python3 virtual environment
+	pi3 install virtualenvwrapper
+	Add the following to ~/.bashrc:
+		export WORKON_HOME=$HOME/.virtualenvs
+		export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+		#export PROJECT_HOME=$HOME/Devel
+		source /usr/local/bin/virtualenvwrapper.sh
+	mkvirtualenv py3
+	workon py3
+Install Python packages
+	pip install pyindi-client
 	pip install numpy astropy gobject PyGObject opencv-python pypng scipy
 	pip install pdoc3
 
