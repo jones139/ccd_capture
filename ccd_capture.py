@@ -621,6 +621,17 @@ class Ccd_capture(WebControlClass):
         imgBytes = encImg.tobytes()
         return(imgBytes)
 
+    def getRoiCroppedWebImage(self):
+        """ return a copy of the current roi, scaled for web viewing
+        """
+        roiImg = self.curImg.copy()
+        roiImg = roiImg[self.roiOriginY : self.roiOriginY + self.roiSizeY, 
+                        self.roiOriginX :  self.roiOriginX + self.roiSizeX]
+        res = self.resizeImgForWeb(roiImg)
+        success, encImg = cv2.imencode('.png',res)
+        imgBytes = encImg.tobytes()
+        return(imgBytes)
+
     
     def getFrameHistogram(self):
         """ get an image of the histogram of the current image.
@@ -745,6 +756,7 @@ class Ccd_capture(WebControlClass):
         /getData - returns a JSON string summarising the current state.
         /getImage - returns a web-scaled version of the latest camera image.
         /getRoiImage - as for /getImage but the defined ROI is highlighted on the image.
+        /getRoiCroppedImage - image is cropped to just include the ROI
         /getFullImage - NOT IMPLEMENTED
         /getFrameHistogram - returns an image of the pixel intensity histogram for the current image.
         /getRoiHistogram - returns an image of the pixel intensity histogram for the Region of Interest in the current image.
@@ -788,6 +800,15 @@ class Ccd_capture(WebControlClass):
                 else:
                     # response.set_header('Content-type', 'image/png')
                     img = self.getRoiWebImage()
+                    #print("getRoi Image: img=",img)
+                    return(img)
+            elif (cmdStr.lower()=="getRoiCroppedImage".lower()):
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print("getRoiCroppedImage(): no image yet!")
+                    return("<p>No Image</p>")
+                else:
+                    # response.set_header('Content-type', 'image/png')
+                    img = self.getRoiCroppedWebImage()
                     #print("getRoi Image: img=",img)
                     return(img)
             elif (cmdStr.lower()=="getFullImage".lower()):

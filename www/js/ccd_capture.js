@@ -29,6 +29,7 @@ function updateDashboard(dataStr) {
 	    if (((val - lastImageDate) > 1) || (lastImageDate==-1)) {
 		$("#camera-preview-image").attr("src",imgSrc);
 		$("#roi-preview-image").attr("src","/getRoiImage?" + new Date().getTime());
+		$("#roi-cropped-image").attr("src","/getRoiCroppedImage?" + new Date().getTime());
 		$("#histogram-image").attr("src","/getFrameHistogram?"+ new Date().getTime());
 		$("#x-profile-image").attr("src","/getXProfile?"+ new Date().getTime());
 		$("#y-profile-image").attr("src","/getYProfile?"+ new Date().getTime());
@@ -76,9 +77,79 @@ function updateDashboard(dataStr) {
 	} else {
             $("#"+key).html(val);
         }
-    });   
-    
+    });
+
+    // Show the image area selector on the ROI image - we need to scale
+    // because we are working on a scaled image.
+    xScale = $('#roi-preview-image').width() / obj['subFrameSizeX'];
+    yScale = $('#roi-preview-image').height() / obj['subFrameSizeY'];
+    x1=obj['roiOriginX'] * xScale;
+    y1=obj['roiOriginY'] * yScale;
+    x2=(obj['roiSizeX']+obj['roiOriginX']) * xScale;
+    y2=(obj['roiSizeY']+obj['roiOriginY']) * yScale;
+    //alert("roiSizeX="+obj['roiSizeX']+" x2="+x2);
+    $('#roi-preview-image').imgAreaSelect({ x1: x1,
+					    y1: y1,
+					    x2: x2,
+					    y2: y2,
+					    handles: true,
+					    onSelectEnd: updateRoi});
+
+    // Show the image area selector on the Subframe image - we need to scale
+    // because we are working on a scaled image.
+    xScale = $('#camera-preview-image').width() / obj['subFrameSizeX'];
+    yScale = $('#camera-preview-image').height() / obj['subFrameSizeY'];
+    x1=0;
+    y1=0;
+    x2=(obj['subFrameSizeX']) * xScale;
+    y2=(obj['subFrameSizeY']) * yScale;
+    //alert("subFrameSizeX="+obj['subFrameSizeX']+" x2="+x2);
+    $('#camera-preview-image').imgAreaSelect({ x1: x1,
+					    y1: y1,
+					    x2: x2,
+					    y2: y2,
+					    handles: true,
+					    onSelectEnd: updateSubframe});
+
 };
+
+
+updateRoi = function(img,roiObj) {
+    //alert("updateRoi: "+roiObj['x1']+","+roiObj['y1']+" : "+roiObj['x2']+","+roiObj['y2']);
+    xScale = $('#roi-preview-image').width() / obj['subFrameSizeX'];
+    yScale = $('#roi-preview-image').height() / obj['subFrameSizeY'];
+    $('#loading-indicator').show();
+    $("#roi-origin-x").val(Math.round(roiObj['x1'] / xScale));
+    $("#roi-origin-y").val(Math.round(roiObj['y1'] / yScale));
+    $("#roi-size-x").val(Math.round((roiObj['x2'] - roiObj['x1']) / xScale));
+    $("#roi-size-y").val(Math.round((roiObj['y2'] - roiObj['y1']) / yScale));
+    val = $("#roi-origin-x").val() + "," + $("#roi-origin-y").val()
+	+ ":" + $("#roi-size-x").val() + "," + $("#roi-size-y").val();
+    $.post("/setRoi/"+val, function(data,status) {
+        $('#loading-indicator').hide();
+        //alert("data: "+data);
+    });
+}
+
+updateSubframe = function(img,subframeObj) {
+    xScale = $('#camera-preview-image').width() / obj['subFrameSizeX'];
+    yScale = $('#camera-preview-image').height() / obj['subFrameSizeY'];
+    $('#loading-indicator').show();
+    $("#subframe-origin-x").val(obj['subFrameOriginX'] + Math.round(subframeObj['x1'] / xScale));
+    $("#subframe-origin-y").val(obj['subFrameOriginY'] + Math.round(subframeObj['y1'] / yScale));
+    $("#subframe-size-x").val(Math.round((subframeObj['x2'] - subframeObj['x1'])
+					 / xScale));
+    $("#subframe-size-y").val(Math.round((subframeObj['y2'] - subframeObj['y1'])
+					 / yScale));
+    val = $("#subframe-origin-x").val() + "," + $("#subframe-origin-y").val()
+	+ ":" + $("#subframe-size-x").val() + "," + $("#subframe-size-y").val();
+    alert("updateSubframe: "+val);
+    $.post("/setSubframe/"+val, function(data,status) {
+        $('#loading-indicator').hide();
+        //alert("data: "+data);
+    });
+}
+
 
 $(document).ready(function(){
     $("#set-cooler-setpoint-btn").click(function(evt) {
