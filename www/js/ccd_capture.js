@@ -107,6 +107,15 @@ $(document).ready(function(){
         });
     });
 
+    $("#clear-subframe-btn").click(function(evt) {
+        $('#loading-indicator').show();
+        $.post("/clearSubframe/", function(data,status) {
+            $('#loading-indicator').hide();
+            //alert("data: "+data);
+        });
+    });
+    
+
     $("#set-roi-btn").click(function(evt) {
         $('#loading-indicator').show();
 	val = $("#roi-origin-x").val() + "," + $("#roi-origin-y").val()

@@ -111,6 +111,8 @@
 	<input id="subframe-size-x" class="form-control" value=1000 />,
 	<input id="subframe-size-y" class="form-control" value=1000 />
 	<button id="set-subframe-btn" class="btn btn-primary" >Set SubFrame</button>
+	<button id="clear-subframe-btn" class="btn btn-primary" >Clear SubFrame</button>
+
       </div>
       
       <div class="input-group">
@@ -136,6 +138,7 @@
       
       
       <p>Current Image Time: <span id="curImageTime">---</span>.</p>
+      <h3>Full Image Analysis</h3>
       <p>Image Mean Intensity: <span id="curImageMean">--</span>,
 	SD: <span id="curImageSd">--</span>&percnt;</p>
       <img id="histogram-image" alt="Histogram Image"
@@ -144,6 +147,9 @@
 	   style="width:30%"/>
       <img id="y-profile-image" alt="Y Profile Image"
 	   style="width:30%"/>
+      <br/>
+      <img id="camera-preview-image" alt="Camera Preview Image"/>
+      <h3>ROI Analysis</h3>
       <p>ROI Mean Intensity: <span id="curRoiMean">--</span>,
 	SD: <span id="curRoiSd">--</span>&percnt;</p>
       <img id="roi-histogram-image" alt="ROI Histogram Image"
@@ -152,7 +158,7 @@
 	   style="width:30%"/>
       <img id="roi-y-profile-image" alt="ROI Y Profile Image"
 	   style="width:30%"/>
-      <img id="camera-preview-image" alt="Camera Preview Image"/>
+      <br/>
       <img id="roi-preview-image" alt="ROI Preview Image"/>
     </div>
     

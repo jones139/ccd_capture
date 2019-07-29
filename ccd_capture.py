@@ -388,10 +388,10 @@ class Ccd_capture(WebControlClass):
         print("got frame object:")
         for n in ccd_frame:
             print(n.name," = ",n.value)
-        self.subFrameOriginX = ccd_frame[0].value
-        self.subFrameOriginY = ccd_frame[1].value
-        self.subFrameSizeX = ccd_frame[2].value
-        self.subFrameSizeY = ccd_frame[3].value
+        self.subFrameOriginX = int(ccd_frame[0].value)
+        self.subFrameOriginY = int(ccd_frame[1].value)
+        self.subFrameSizeX = int(ccd_frame[2].value)
+        self.subFrameSizeY = int(ccd_frame[3].value)
         print("getSubFrame complete")
 
     def setSubFrame(self):
@@ -414,7 +414,18 @@ class Ccd_capture(WebControlClass):
         self.indiclient.sendNewNumber(ccd_frame)
         print("setFrame complete")
 
+    def clearSubFrame(self):
+        """ Reset the camera subframe to be the whole sensor dimensions.
+        """
+        self.subFrameOriginX = 0
+        self.subFrameOriginY = 0
+        self.subFrameSizeX = self.frameSizeX
+        self.subFrameSizeY = self.frameSizeY
+        self.setSubFrame()
+        print("clearSubFrame complete")
 
+
+        
     def getCcdTemperature(self):
         """ Retrieve the current temperature of the CCD from the camera
         """
@@ -868,6 +879,9 @@ class Ccd_capture(WebControlClass):
                 self.subFrameSizeY   = int(size.split(",")[1])
                 self.setSubFrame()
                 return("ok")
+            elif (cmdStr.lower()=="clearSubFrame".lower()):
+                self.clearSubFrame()
+                return("ok")
             elif (cmdStr.lower()=="setRoi".lower()):
                 origin, size =  valStr.split(":")
                 print(origin,size)
@@ -884,10 +898,10 @@ class Ccd_capture(WebControlClass):
                     print("Clipped ROI to fit in subFrame - Y")
                 return("ok")
             elif (cmdStr.lower()=="clearRoi".lower()):
-                self.roiOriginX = self.subFrameOriginX
-                self.roiOriginY = self.subFrameOriginY
-                self.roiSizeX   = self.subFrameSizeX
-                self.roiSizeY   = self.subFrameSizeY
+                self.roiOriginX = int(self.subFrameOriginX)
+                self.roiOriginY = int(self.subFrameOriginY)
+                self.roiSizeX   = int(self.subFrameSizeX)
+                self.roiSizeY   = int(self.subFrameSizeY)
             else:                
                 print("ERROR - Unreconised Command %s" % cmdStr)
                 return("<h1>ERROR - Unreconised Command %s</h1>" % cmdStr)
