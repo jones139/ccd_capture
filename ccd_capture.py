@@ -142,6 +142,8 @@ class Ccd_capture(WebControlClass):
     roiSizeY = 100  # Pixels
     frameSizeX = 0  # Pixels
     frameSizeY = 0  # Pixels
+    binX = 1    # Horizontal binning (pixels)
+    binY = 1    # Vertical binning (pixels)
     coolerSetpoint = 0.0 # degC
     coolerOn = False
     ccdTemp = -1
@@ -195,6 +197,8 @@ class Ccd_capture(WebControlClass):
         obj['roiSizeY']=self.roiSizeY
         obj['frameSizeX']=self.frameSizeX
         obj['frameSizeY']=self.frameSizeY
+        obj['binX']=self.binX
+        obj['binY']=self.binY
         obj['coolerSetpoint']=self.coolerSetpoint
         obj['coolerOn']=self.coolerOn
         obj['ccdTemp']=self.ccdTemp
@@ -425,6 +429,28 @@ class Ccd_capture(WebControlClass):
         print("clearSubFrame complete")
 
 
+    def setBinning(self, binX, binY):
+        """ Sets the camera binning to match binX and binY
+        parameters.
+        """
+        self.binX = binX
+        self.binY = binY
+
+        ccd_binning=self.device_ccd.getNumber("CCD_BINNING")
+        while not(ccd_binning):
+            time.sleep(0.5)
+            ccd_binning=self.device_ccd.getNumber("CCD_BINNING")
+            sys.stderr.write(".")
+            sys.stderr.flush()
+        print("got ccd_binning object ", ccd_binning)
+        for n in ccd_binning:
+            print(n.name," = ",n.value)
+        ccd_binning[0].value = self.binX
+        ccd_binning[1].value = self.binY
+        self.indiclient.sendNewNumber(ccd_binning)
+
+    def resetBinning(self):
+        self.setBinning(1,1)
         
     def getCcdTemperature(self):
         """ Retrieve the current temperature of the CCD from the camera
@@ -433,7 +459,7 @@ class Ccd_capture(WebControlClass):
         ccd_temp=self.device_ccd.getNumber("CCD_TEMPERATURE")
         while not(ccd_temp):
             time.sleep(0.5)
-            ccd_frame=self.device_ccd.getNumber("CCD_TEMPERATURE")
+            ccd_temp=self.device_ccd.getNumber("CCD_TEMPERATURE")
             sys.stderr.write(".")
             sys.stderr.flush()
         #print("got ccd_temp object ", ccd_temp)
@@ -452,7 +478,7 @@ class Ccd_capture(WebControlClass):
         ccd_temp=self.device_ccd.getNumber("CCD_TEMPERATURE")
         while not(ccd_temp):
             time.sleep(0.5)
-            ccd_frame=self.device_ccd.getNumber("CCD_TEMPERATURE")
+            ccd_temp=self.device_ccd.getNumber("CCD_TEMPERATURE")
             sys.stderr.write(".")
             sys.stderr.flush()
         #print("got ccd_temp object ", ccd_temp)
