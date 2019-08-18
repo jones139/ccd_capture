@@ -36,6 +36,17 @@ Install Python packages
 	pip install numpy astropy gobject PyGObject opencv-python pypng scipy
 	pip install matplotlib pdoc3
 
+Install ImageJ image analysis programme
+	wget http://wsr.imagej.net/distros/cross-platform/ij152.zip
+	unzip ij152.zip
+	sudo mv ImageJ /usr/local
+	sudo apt install default-jdk
+	Edit /usr/local/ImageJ/run to read java -Xmx512m -jar /usr/local/ImageJ/ij.jar
+
+	sudo ln -s /usr/local/ImageJ/run /usr/local/bin/ij
+	ImageJ can now be run using the command 'ij'
+	
+
 
 User Instructions
 ============
