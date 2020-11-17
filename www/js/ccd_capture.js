@@ -1,6 +1,9 @@
 
 var lastImageDate = -1;
 var continuousMode = 0;
+var getDataTimer = null;
+var getDataTimerPeriod = 1000;
+var subframeSelectInProgress = 0;
 
 function getData() {
     $.ajax({url:"/getData",success:updateDashboard});
@@ -95,21 +98,6 @@ function updateDashboard(dataStr) {
 					    handles: true,
 					    onSelectEnd: updateRoi});
 
-    // Show the image area selector on the Subframe image - we need to scale
-    // because we are working on a scaled image.
-    xScale = $('#camera-preview-image').width() / obj['subFrameSizeX'];
-    yScale = $('#camera-preview-image').height() / obj['subFrameSizeY'];
-    x1=0;
-    y1=0;
-    x2=(obj['subFrameSizeX']) * xScale;
-    y2=(obj['subFrameSizeY']) * yScale;
-    //alert("subFrameSizeX="+obj['subFrameSizeX']+" x2="+x2);
-    $('#camera-preview-image').imgAreaSelect({ x1: x1,
-					    y1: y1,
-					    x2: x2,
-					    y2: y2,
-					    handles: true,
-					    onSelectEnd: updateSubframe});
 
 };
 
@@ -148,6 +136,11 @@ updateSubframe = function(img,subframeObj) {
         $('#loading-indicator').hide();
         //alert("data: "+data);
     });
+    subframeSelectInProgress = 0;
+    $("#select-subframe-btn").html("Select Subframe from Image");
+    getDataTimer = setInterval("getData();",getDataTimerPeriod);
+    getData();
+
 }
 
 
@@ -178,6 +171,37 @@ $(document).ready(function(){
         });
     });
 
+    // select-subframe disables the regular updates of the UI and displays
+    // handles on the preview image to allow the user to select a subframe
+    $("#select-subframe-btn").click(function(evt) {
+	if (subframeSelectInProgress) {
+	    subframeSelectInProgress = 0;
+	    $("#select-subframe-btn").html("Select Subframe from Image");
+	    getDataTimer = setInterval("getData();",getDataTimerPeriod);
+	    getData();
+	} else {
+	    subframeSelectInProgress = 1;
+	    $("#select-subframe-btn").html("Cancel");
+	    clearInterval(getDataTimer);
+	    
+	    // Show the image area selector on the Subframe image - we need to scale
+	    // because we are working on a scaled image.
+	    xScale = $('#camera-preview-image').width() / obj['subFrameSizeX'];
+	    yScale = $('#camera-preview-image').height() / obj['subFrameSizeY'];
+	    x1=0;
+	    y1=0;
+	    x2=(obj['subFrameSizeX']) * xScale;
+	    y2=(obj['subFrameSizeY']) * yScale;
+	    //alert("subFrameSizeX="+obj['subFrameSizeX']+" x2="+x2);
+	    $('#camera-preview-image').imgAreaSelect({ x1: x1,
+						       y1: y1,
+						       x2: x2,
+						       y2: y2,
+						       handles: true,
+						       onSelectEnd: updateSubframe});
+	}
+    });
+    
     $("#clear-subframe-btn").click(function(evt) {
         $('#loading-indicator').show();
         $.post("/clearSubframe/", function(data,status) {
@@ -257,6 +281,6 @@ $(document).ready(function(){
     });
 
     
-    setInterval("getData();",1000);
+    getDataTimer = setInterval("getData();",getDataTimerPeriod);
     getData();
 });        

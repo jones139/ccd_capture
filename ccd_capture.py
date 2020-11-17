@@ -632,6 +632,14 @@ class Ccd_capture(WebControlClass):
         imgBytes = encImg.tobytes()
         return(imgBytes)
 
+    def getFullImage(self):
+        """ return a full resolution image of the current image in tiff format.
+        """
+        success, encImg = cv2.imencode('.tiff',self.curImg)
+        imgBytes = encImg.tobytes()
+        return(imgBytes)
+
+    
     def getRoiWebImage(self):
         """ return a copy of the current image, scaled to 800 px width
         """
@@ -838,7 +846,14 @@ class Ccd_capture(WebControlClass):
                     #print("getRoi Image: img=",img)
                     return(img)
             elif (cmdStr.lower()=="getFullImage".lower()):
-                print("FIXME - Implement getFullImage")
+                if (self.status == self.STATUS_NO_IMAGE):
+                    print("getFullImage(): no image yet!")
+                    return("<p>No Image</p>")
+                else:
+                    # response.set_header('Content-type', 'image/png')
+                    img = self.getFullImage()
+                    #print("getImage: img=",img)
+                    return(img)
             elif (cmdStr.lower()=="getFrameHistogram".lower()):
                 if (self.status == self.STATUS_NO_IMAGE):
                     print("getFrameHistogram(): no image yet!")
@@ -890,14 +905,14 @@ class Ccd_capture(WebControlClass):
         elif (methodStr=="POST"):
             if (cmdStr.lower()=="startExposure".lower()):
                 self.startExposure()
-                pass
+                return("ok")
             elif (cmdStr.lower()=="startContinuousExposures".lower()):
                 self.continuousMode = True
                 self.startExposure()
-                pass
+                return("ok")
             elif (cmdStr.lower()=="stopContinuousExposures".lower()):
                 self.continuousMode = False
-                pass
+                return("ok")
             elif (cmdStr.lower()=="saveImage".lower()):
                 self.saveFnameRoot = valStr
                 self.saveImage()
