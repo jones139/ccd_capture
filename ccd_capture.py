@@ -984,6 +984,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='CCD Camera Server')
     parser.add_argument('--sim', dest='simulator', action='store_true',
                         help='Use the simulator rather than the real camera')
+    parser.add_argument('--camId', default="Atik 383L",
+                        help='Camera ID to use (default Atik 383L)')
 
     argsNamespace = parser.parse_args()
     args = vars(argsNamespace)
@@ -994,6 +996,7 @@ if __name__ == "__main__":
     if (args['simulator']):
         cameraId = "CCD Simulator"
     else:
-        cameraId = "Atik 383L"
+        #cameraId = "Atik 383L"
+        cameraId = args['camId']
     ccdCapture = Ccd_capture(cameraId, dataDir)
     print("Ccd_capture complete")
